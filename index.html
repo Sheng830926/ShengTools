@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShengTools | 多功能工具箱</title>
+    <!-- SEO 優化與 Meta 標籤 -->
+    <meta name="description" content="ShengTools 是一個極易擴充的線上工具箱，採用現代化 Web 設計，支援字數統計等多種常用工具，並提供深色模式與響應式版面切換。">
+    <meta name="keywords" content="線上工具, 字數統計, 開發人員工具, ShengTools, 多功能工具箱, SPA">
+    <meta name="author" content="ShengTools Team">
+    
+    <!-- Google Fonts - 導入 Outfit (現代感無襯線字型) 與 JetBrains Mono (適合程式碼及等寬數據) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 圖示庫 (CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- 引入自訂樣式表 -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 整體應用程式版面配置 -->
+    <div class="app-layout">
+        <!-- 側邊欄 (Sidebar) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <!-- 點擊 Logo 可回到首頁 -->
+                <a href="#/" class="logo-area" id="logoLink">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-cubes-stacked"></i>
+                    </div>
+                    <span class="logo-text">Sheng<span class="highlight">Tools</span></span>
+                </a>
+                <!-- 行動版關閉按鈕 -->
+                <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="關閉選單">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- 搜尋框區域 -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" placeholder="搜尋工具..." autocomplete="off" aria-label="搜尋工具">
+                <button id="clearSearchBtn" class="clear-search-btn" aria-label="清除搜尋內容" style="display: none;">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- 導覽選單 (將透過 JavaScript 動態生成分類與工具清單) -->
+            <div class="sidebar-menu-wrapper">
+                <nav class="sidebar-menu" id="sidebarMenu" aria-label="工具選單">
+                    <!-- 動態渲染的工具清單將出現在此 -->
+                </nav>
+            </div>
+            
+            <!-- 側邊欄底部 (主題切換與資訊) -->
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="sidebarThemeToggleBtn" aria-label="切換深色/淺色模式">
+                    <span class="theme-toggle-icon">
+                        <i class="fa-solid fa-moon dark-icon"></i>
+                        <i class="fa-solid fa-sun light-icon"></i>
+                    </span>
+                    <span class="theme-text">切換主題</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- 背景遮罩 (行動版側邊欄開啟時阻擋背景) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- 右側主要內容區 -->
+        <main class="main-content" id="mainContent">
+            <!-- 頂部導航列 (行動裝置主要使用) -->
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="開啟側邊選單">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="header-title" id="headerTitle">首頁</h1>
+                </div>
+                <div class="header-right">
+                    <!-- 行動版頂部主題切換按鈕 -->
+                    <button class="header-theme-toggle" id="headerThemeToggleBtn" aria-label="切換深色/淺色模式">
+                        <i class="fa-solid fa-moon dark-icon"></i>
+                        <i class="fa-solid fa-sun light-icon"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- 工具主渲染區域 (SPA 內容動態替換) -->
+            <div class="tool-viewport" id="toolViewport">
+                <!-- 預設顯示首頁內容，會由 JavaScript 動態載入 -->
+            </div>
+        </main>
+    </div>
+    
+    <!-- 引入主應用邏輯 JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
