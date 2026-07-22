@@ -122,6 +122,62 @@ export function diffLines(linesA, linesB) {
     return diff.reverse();
 }
 
+// 4.1 字元級差異比對 (Character-level / Word-level inline diff)
+export function diffChars(strA, strB) {
+    if (strA === strB) {
+        return { htmlA: escapeHtml(strA), htmlB: escapeHtml(strB) };
+    }
+    
+    // 如果單行過長 (>1000字)，避免 DP 表記憶體太大，直接做基礎高亮
+    if (strA.length > 1000 || strB.length > 1000) {
+        return {
+            htmlA: `<mark class="diff-char-delete">${escapeHtml(strA)}</mark>`,
+            htmlB: `<mark class="diff-char-insert">${escapeHtml(strB)}</mark>`
+        };
+    }
+
+    const n = strA.length, m = strB.length;
+    const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+
+    for (let i = 1; i <= n; i++) {
+        for (let j = 1; j <= m; j++) {
+            if (strA[i - 1] === strB[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    let i = n, j = m;
+    const resA = [];
+    const resB = [];
+
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && strA[i - 1] === strB[j - 1]) {
+            resA.push(escapeHtml(strA[i - 1]));
+            resB.push(escapeHtml(strB[j - 1]));
+            i--;
+            j--;
+        } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+            resB.push(`<mark class="diff-char-insert">${escapeHtml(strB[j - 1])}</mark>`);
+            j--;
+        } else {
+            resA.push(`<mark class="diff-char-delete">${escapeHtml(strA[i - 1])}</mark>`);
+            i--;
+        }
+    }
+
+    const rawHtmlA = resA.reverse().join('');
+    const rawHtmlB = resB.reverse().join('');
+
+    // 合併連續的 <mark> 標籤提升效能與渲染美觀
+    return {
+        htmlA: rawHtmlA.replace(/<\/mark><mark class="diff-char-delete">/g, ''),
+        htmlB: rawHtmlB.replace(/<\/mark><mark class="diff-char-insert">/g, '')
+    };
+}
+
 // 5. 簡易 Regex-based Markdown 編譯引擎
 export function compileMarkdown(md) {
     if (!md.trim()) return "<span style='color:var(--text-muted)'>等待輸入 Markdown 內容...</span>";

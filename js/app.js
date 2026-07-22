@@ -50,7 +50,7 @@ function setTheme(theme) {
 }
 
 /**
- * 行動端側邊欄手勢
+ * 側邊欄控制 (支援桌上型收合與行動端選單)
  */
 function initSidebarMobile() {
     const appLayout = document.querySelector(".app-layout");
@@ -58,25 +58,41 @@ function initSidebarMobile() {
     const mobileCloseBtn = document.getElementById("mobileCloseBtn");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
 
-    const openSidebar = () => appLayout.classList.add("sidebar-open");
-    const closeSidebar = () => appLayout.classList.remove("sidebar-open");
+    // 載入桌上型電腦預設收合狀態
+    const isCollapsed = localStorage.getItem("shengtools-sidebar-collapsed") === "true";
+    if (isCollapsed) {
+        appLayout.classList.add("sidebar-collapsed");
+    }
 
-    if (menuToggleBtn) menuToggleBtn.addEventListener("click", openSidebar);
-    if (mobileCloseBtn) mobileCloseBtn.addEventListener("click", closeSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener("click", closeSidebar);
+    const toggleSidebar = () => {
+        if (window.innerWidth <= 768) {
+            // 行動版切換抽屜
+            appLayout.classList.toggle("sidebar-open");
+        } else {
+            // 桌上型電腦切換收合/展開
+            const nowCollapsed = appLayout.classList.toggle("sidebar-collapsed");
+            localStorage.setItem("shengtools-sidebar-collapsed", nowCollapsed ? "true" : "false");
+        }
+    };
+
+    const closeMobileSidebar = () => appLayout.classList.remove("sidebar-open");
+
+    if (menuToggleBtn) menuToggleBtn.addEventListener("click", toggleSidebar);
+    if (mobileCloseBtn) mobileCloseBtn.addEventListener("click", closeMobileSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener("click", closeMobileSidebar);
 
     const sidebarMenu = document.getElementById("sidebarMenu");
     if (sidebarMenu) {
         sidebarMenu.addEventListener("click", (e) => {
             if (e.target.closest(".menu-item")) {
-                closeSidebar();
+                closeMobileSidebar();
             }
         });
     }
 
     const logoLink = document.getElementById("logoLink");
     if (logoLink) {
-        logoLink.addEventListener("click", closeSidebar);
+        logoLink.addEventListener("click", closeMobileSidebar);
     }
 }
 
