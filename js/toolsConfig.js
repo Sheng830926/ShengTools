@@ -5,6 +5,7 @@ import { jsonFormatterTool } from './tools/jsonFormatter.js';
 import { base64CodecTool } from './tools/base64Codec.js';
 import { urlCodecTool } from './tools/urlCodec.js';
 import { regexTesterTool } from './tools/regexTester.js';
+import { jweHelperTool } from './tools/jweHelper.js';
 import { httpStatusTool } from './tools/httpStatus.js';
 import { converterBoxTool } from './tools/converterBox.js';
 import { textCompareTool } from './tools/textCompare.js';
@@ -20,6 +21,7 @@ export const toolsConfig = [
     base64CodecTool,
     urlCodecTool,
     regexTesterTool,
+    jweHelperTool,
     httpStatusTool,
     converterBoxTool,
     textCompareTool,
