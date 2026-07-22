@@ -6,7 +6,9 @@ import { base64CodecTool } from './tools/base64Codec.js';
 import { urlCodecTool } from './tools/urlCodec.js';
 import { regexTesterTool } from './tools/regexTester.js';
 import { jweHelperTool } from './tools/jweHelper.js';
+import { hashGeneratorTool } from './tools/hashGenerator.js';
 import { httpStatusTool } from './tools/httpStatus.js';
+import { mimeTypeTool } from './tools/mimeType.js';
 import { converterBoxTool } from './tools/converterBox.js';
 import { textCompareTool } from './tools/textCompare.js';
 import { markdownEditorTool } from './tools/markdownEditor.js';
@@ -22,7 +24,9 @@ export const toolsConfig = [
     urlCodecTool,
     regexTesterTool,
     jweHelperTool,
+    hashGeneratorTool,
     httpStatusTool,
+    mimeTypeTool,
     converterBoxTool,
     textCompareTool,
     markdownEditorTool,
