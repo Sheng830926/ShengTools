@@ -1,0 +1,4 @@
+# ShengTools Git Ignore
+JweHelper.cs
+*.log
+.DS_Store
