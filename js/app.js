@@ -321,9 +321,8 @@ function renderHomeView(container, filteredTools) {
         <div class="home-wrapper">
             <section class="hero-section">
                 <div class="hero-content">
-                    <span class="hero-subtitle">SHENGTOOLS WEB APP</span>
                     <h2 class="hero-title">全方位線上多功能工具箱</h2>
-                    <p class="hero-desc">為開發者、設計師及日常文字處理打造的純前端線上工具集。無廣告、無後端傳輸，100% 本地安全執行。</p>
+                    <p class="hero-desc">純前端線上工具集。無廣告、無後端傳輸，100% 本地安全執行。</p>
                 </div>
             </section>
             

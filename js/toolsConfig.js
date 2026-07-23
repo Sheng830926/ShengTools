@@ -6,6 +6,7 @@ import { base64CodecTool } from './tools/base64Codec.js';
 import { urlCodecTool } from './tools/urlCodec.js';
 import { regexTesterTool } from './tools/regexTester.js';
 import { jweHelperTool } from './tools/jweHelper.js';
+import { companyCryptoTool } from './tools/companyCrypto.js';
 import { hashGeneratorTool } from './tools/hashGenerator.js';
 import { httpStatusTool } from './tools/httpStatus.js';
 import { mimeTypeTool } from './tools/mimeType.js';
@@ -24,6 +25,7 @@ export const toolsConfig = [
     urlCodecTool,
     regexTesterTool,
     jweHelperTool,
+    companyCryptoTool,
     hashGeneratorTool,
     httpStatusTool,
     mimeTypeTool,
