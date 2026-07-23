@@ -4,7 +4,7 @@ export const currencyConverterTool = {
     id: 'currency-converter',
     name: '貨幣轉換器',
     icon: 'fa-solid fa-money-bill-transfer',
-    category: '實用工具',
+    category: '實用與設計',
     description: '即時匯率貨幣轉換器，支援全球 30+ 種主要貨幣即時換算。',
     render(container) {
         const currencies = {

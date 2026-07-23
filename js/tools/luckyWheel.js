@@ -5,7 +5,7 @@ export const luckyWheelTool = {
     id: "lucky-wheel",
     name: "幸運抽籤輪盤",
     icon: "fa-solid fa-arrows-spin",
-    category: "實用工具",
+    category: "實用與設計",
     description: "自訂抽籤選項，點擊旋轉輪盤進行隨機抽籤，支援大氣的物理減速動態效果與中獎高亮提示。",
     render: (container) => {
         container.innerHTML = `

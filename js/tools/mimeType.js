@@ -7,7 +7,7 @@ export const mimeTypeTool = {
     id: "mime-type",
     name: "MIME 類型查詢對照表",
     icon: "fa-solid fa-file-code",
-    category: "開發工具",
+    category: "開發與網路",
     description: "查詢常見的 MIME Type (Multipurpose Internet Mail Extensions) 與檔案副檔名、Content-Type 標頭範例與伺服器設定。",
     render: (container) => {
         container.innerHTML = `

@@ -7,7 +7,7 @@ export const regexTesterTool = {
     id: "regex-tester",
     name: "正規表達式測試器",
     icon: "fa-solid fa-magnifying-glass-chart",
-    category: "開發工具",
+    category: "開發與網路",
     description: "輸入 RegExp 正則與測試文字，即時預覽高亮匹配的區段與結果。",
     render: (container) => {
         container.innerHTML = `

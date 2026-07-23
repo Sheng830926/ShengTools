@@ -5,7 +5,7 @@ export const caseConverterTool = {
     id: "case-converter",
     name: "文字大小寫轉換器",
     icon: "fa-solid fa-font",
-    category: "文字工具",
+    category: "文字處理",
     description: "快速轉換英文大小寫，支援 UPPERCASE、lowercase、Title Case、Sentence Case、camelCase、snake_case。",
     render: (container) => {
         container.innerHTML = `

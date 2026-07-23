@@ -5,7 +5,7 @@ export const qrGeneratorTool = {
     id: "qr-generator",
     name: "QR Code 生成器",
     icon: "fa-solid fa-qrcode",
-    category: "實用工具",
+    category: "實用與設計",
     description: "輸入任意文字或網址 URL 即時生成 QR Code 二維碼，支援自訂多種尺寸並可一鍵下載。",
     render: (container) => {
         container.innerHTML = `

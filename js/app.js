@@ -278,12 +278,10 @@ function renderHomeView(container, filteredTools) {
     } else {
         for (const [categoryName, tools] of Object.entries(grouped)) {
             let catIcon = "fa-solid fa-toolbox";
-            if (categoryName === "開發工具") catIcon = "fa-solid fa-laptop-code";
-            else if (categoryName === "文字工具") catIcon = "fa-solid fa-pen-nib";
-            else if (categoryName === "安全工具") catIcon = "fa-solid fa-shield-halved";
-            else if (categoryName === "計算工具") catIcon = "fa-solid fa-calculator";
-            else if (categoryName === "設計工具") catIcon = "fa-solid fa-palette";
-            else if (categoryName === "實用工具") catIcon = "fa-solid fa-cubes";
+            if (categoryName === "文字處理") catIcon = "fa-solid fa-pen-nib";
+            else if (categoryName === "安全與加解密") catIcon = "fa-solid fa-shield-halved";
+            else if (categoryName === "實用與設計") catIcon = "fa-solid fa-cubes";
+            else if (categoryName === "開發與網路") catIcon = "fa-solid fa-laptop-code";
 
             blocksHtml += `
                 <div class="category-block" data-category="${categoryName}">

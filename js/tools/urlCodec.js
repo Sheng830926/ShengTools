@@ -5,7 +5,7 @@ export const urlCodecTool = {
     id: "url-codec",
     name: "URL 編解碼器",
     icon: "fa-solid fa-link",
-    category: "開發工具",
+    category: "安全與加解密",
     description: "將網址查詢參數 (Query String) 進行 URL Percent-Encoding 編碼與解碼。",
     render: (container) => {
         container.innerHTML = `

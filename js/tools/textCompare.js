@@ -7,7 +7,7 @@ export const textCompareTool = {
     id: "text-compare",
     name: "文本比對器",
     icon: "fa-solid fa-code-compare",
-    category: "文字工具",
+    category: "文字處理",
     description: "雙欄並排對比文字差異，同一行內高亮標示細微差異字元，支援左右雙向同步滾動與差異點快速跳轉。",
     render: (container) => {
         container.innerHTML = `

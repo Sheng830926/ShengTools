@@ -5,7 +5,7 @@ export const httpStatusTool = {
     id: "http-status",
     name: "HTTP 狀態碼對照表",
     icon: "fa-solid fa-server",
-    category: "開發工具",
+    category: "開發與網路",
     description: "查詢完整的 HTTP 狀態碼（1xx 至 5xx），含官方規範、詳細說明、常見原因、修復建議與 SEO 影響標籤。",
     render: (container) => {
         container.innerHTML = `

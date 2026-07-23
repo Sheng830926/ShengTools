@@ -164,7 +164,7 @@ export const hashGeneratorTool = {
     id: "hash-generator",
     name: "Hash 雜湊生成器",
     icon: "fa-solid fa-hashtag",
-    category: "開發工具",
+    category: "安全與加解密",
     description: "支援 MD5, SHA-1, SHA-256, SHA-384, SHA-512 雜湊演算法與 HMAC 金鑰簽章驗證。",
     render: (container) => {
         container.innerHTML = `

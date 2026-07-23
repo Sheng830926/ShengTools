@@ -5,7 +5,7 @@ export const jsonFormatterTool = {
     id: "json-formatter",
     name: "JSON 格式化與驗證",
     icon: "fa-solid fa-code",
-    category: "開發工具",
+    category: "開發與網路",
     description: "美化排版 JSON 數據，支援一鍵壓縮、結構驗證與語法錯誤即時提示。",
     render: (container) => {
         container.innerHTML = `

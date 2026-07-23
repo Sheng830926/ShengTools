@@ -7,7 +7,7 @@ export const colorToolsTool = {
     id: "color-tools",
     name: "色彩工具與調色盤",
     icon: "fa-solid fa-palette",
-    category: "設計工具",
+    category: "實用與設計",
     description: "色彩選擇器、HEX/RGB/HSL 色碼互轉，並自動計算相鄰色與補色調色盤。",
     render: (container) => {
         container.innerHTML = `

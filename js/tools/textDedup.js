@@ -26,7 +26,7 @@ export const textDedupTool = {
     id: "text-dedup",
     name: "文字重複移除工具",
     icon: "fa-solid fa-filter-circle-xmark",
-    category: "文字工具",
+    category: "文字處理",
     description: "快速移除文字中的重複行、重複單字或重複字元，支援多種去重模式與排序選項。",
     render: (container) => {
         container.innerHTML = `

@@ -147,7 +147,7 @@ export const jweHelperTool = {
     id: "jwe-helper",
     name: "JWE 加解密工具",
     icon: "fa-solid fa-user-shield",
-    category: "開發工具",
+    category: "安全與加解密",
     description: "基於 JweHelper.cs 規範（A256KW + A256CBC-HS512），支援輸入 aPart 與 bPart 金鑰進行 JWE JSON 加密與解密。",
     render: (container) => {
         container.innerHTML = `

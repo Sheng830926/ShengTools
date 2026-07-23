@@ -5,7 +5,7 @@ export const converterBoxTool = {
     id: "converter-box",
     name: "進制與單位轉換器",
     icon: "fa-solid fa-calculator",
-    category: "計算工具",
+    category: "開發與網路",
     description: "整合多重進制聯動換算（二/八/十/十六進制）與長度、重量、溫度、面積常用單位雙向計算。",
     render: (container) => {
         container.innerHTML = `

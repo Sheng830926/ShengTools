@@ -5,7 +5,7 @@ export const wordCounterTool = {
     id: "word-counter",
     name: "字數統計器",
     icon: "fa-solid fa-calculator",
-    category: "文字工具",
+    category: "文字處理",
     description: "即時統計文章字數、字元數（含/不含空白）、英文單字數、段落數與行數，支援一鍵清除與複製。",
     render: (container) => {
         container.innerHTML = `

@@ -4,7 +4,7 @@ export const dateCalculatorTool = {
     id: 'date-calculator',
     name: '日期計算器',
     icon: 'fa-solid fa-calendar-days',
-    category: '實用工具',
+    category: '實用與設計',
     description: '計算兩個日期之間的差距（小時、天數、月數、年數），支援工作天計算，也可從指定日期加減天數推算目標日期。',
     render(container) {
         const today = new Date();
