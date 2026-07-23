@@ -154,7 +154,7 @@ export const jweHelperTool = {
             <div class="tool-layout-container">
                 <div class="tool-info-header">
                     <h2 class="tool-name">JWE 加解密工具</h2>
-                    <p class="tool-description">相容於 C# JweHelper.cs 規格：採用 A256KW (AES Key Wrap) 與 A256CBC-HS512 複合認證加密演算法。</p>
+                    <p class="tool-description">採用 A256KW (AES Key Wrap) 與 A256CBC-HS512 複合認證加密演算法。</p>
                 </div>
 
                 <!-- 金鑰設定卡片 -->
@@ -174,11 +174,11 @@ export const jweHelperTool = {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="editor-panel">
                             <label class="editor-label">A Part (Base64Url)</label>
-                            <input type="text" id="jweAPartInput" class="tool-input-field" placeholder="例如：NeYEYqIctN3rIMmVm2uf8 (預設為空)" autocomplete="off">
+                            <input type="text" id="jweAPartInput" class="tool-input-field" autocomplete="off">
                         </div>
                         <div class="editor-panel">
                             <label class="editor-label">B Part (Base64Url)</label>
-                            <input type="text" id="jweBPartInput" class="tool-input-field" placeholder="例如：Ga0MuvUFUUHf8enWfYoVcQ (預設為空)" autocomplete="off">
+                            <input type="text" id="jweBPartInput" class="tool-input-field" autocomplete="off">
                         </div>
                     </div>
                     <div style="font-size: 0.82rem; color: var(--text-muted);">

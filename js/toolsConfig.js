@@ -15,9 +15,12 @@ import { textCompareTool } from './tools/textCompare.js';
 import { markdownEditorTool } from './tools/markdownEditor.js';
 import { wordCounterTool } from './tools/wordCounter.js';
 import { caseConverterTool } from './tools/caseConverter.js';
+import { textDedupTool } from './tools/textDedup.js';
 import { colorToolsTool } from './tools/colorTools.js';
 import { qrGeneratorTool } from './tools/qrGenerator.js';
 import { luckyWheelTool } from './tools/luckyWheel.js';
+import { dateCalculatorTool } from './tools/dateCalculator.js';
+import { currencyConverterTool } from './tools/currencyConverter.js';
 
 export const toolsConfig = [
     jsonFormatterTool,
@@ -34,7 +37,10 @@ export const toolsConfig = [
     markdownEditorTool,
     wordCounterTool,
     caseConverterTool,
+    textDedupTool,
     colorToolsTool,
     qrGeneratorTool,
-    luckyWheelTool
+    luckyWheelTool,
+    dateCalculatorTool,
+    currencyConverterTool
 ];

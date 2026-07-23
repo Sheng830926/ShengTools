@@ -15,11 +15,11 @@ export const luckyWheelTool = {
                     <p class="tool-description">在左側輸入自訂選項（一行一個），點擊下方按鈕即可旋轉輪盤進行公平抽籤。</p>
                 </div>
                 
-                <div class="tool-grid-2col">
+                <div class="tool-grid-2col" style="grid-template-columns: 1fr 2fr; align-items: start;">
                     <!-- 左側：設定與按鈕 -->
                     <div class="editor-panel">
                         <div class="editor-label">自訂抽籤選項 (每行一個項目)</div>
-                        <div class="editor-textarea-wrapper" style="height: 180px;">
+                        <div class="editor-textarea-wrapper" style="height: 260px;">
                             <textarea id="wheelItems" style="height: 100%;">
 今天吃拉麵 🍜
 今天吃便當 🍱
@@ -42,8 +42,8 @@ export const luckyWheelTool = {
                     
                     <!-- 右側：輪盤與中獎宣告 -->
                     <div class="wheel-section">
-                        <div class="wheel-wrapper">
-                            <canvas id="wheelCanvas" width="300" height="300"></canvas>
+                        <div class="wheel-wrapper" style="width: 460px; height: 460px;">
+                            <canvas id="wheelCanvas" width="460" height="460"></canvas>
                             <!-- CSS 頂部紅色指針 -->
                             <div class="wheel-pointer"></div>
                         </div>
@@ -64,12 +64,12 @@ export const luckyWheelTool = {
         const height = canvas.height;
         const cx = width / 2;
         const cy = height / 2;
-        const radius = width / 2 - 10;
+        const radius = width / 2 - 14;
 
         let items = [];
         let currentAngle = 0;
         let speed = 0;
-        let friction = 0.983; // 減速摩擦力，值越大轉越久
+        let friction = 0.985; // 減速摩擦力，值越大轉越久（輪盤更大，轉久一點更好看）
         let isSpinning = false;
         let animId = null;
 
@@ -80,6 +80,14 @@ export const luckyWheelTool = {
                 .filter(line => line.length > 0);
         };
 
+        // 柔和配色組（避免太刺眼）
+        const colorPalette = [
+            '#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f97316',
+            '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4',
+            '#3b82f6', '#8b5cf6', '#d946ef', '#e11d48', '#ea580c',
+            '#ca8a04', '#65a30d', '#16a34a', '#0d9488', '#0891b2'
+        ];
+
         // 繪製輪盤
         const drawWheel = () => {
             ctx.clearRect(0, 0, width, height);
@@ -88,14 +96,24 @@ export const luckyWheelTool = {
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.textAlign = "center";
-                ctx.fillStyle = "var(--text-muted)";
-                ctx.font = "14px Outfit, Microsoft JhengHei";
+                ctx.fillStyle = "#9ca3af";
+                ctx.font = "16px Outfit, Microsoft JhengHei";
                 ctx.fillText("請在左側輸入選項", 0, 0);
                 ctx.restore();
                 return;
             }
 
             const arcSize = (2 * Math.PI) / items.length;
+
+            // 繪製外框光暈圓環
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius + 6, 0, 2 * Math.PI);
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            ctx.strokeStyle = isDark ? "rgba(99, 102, 241, 0.25)" : "rgba(79, 70, 229, 0.15)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.restore();
 
             // 旋轉畫布整體
             ctx.save();
@@ -111,12 +129,12 @@ export const luckyWheelTool = {
                 ctx.moveTo(0, 0);
                 ctx.arc(0, 0, radius, startAngle, endAngle);
                 ctx.closePath();
-                ctx.fillStyle = `hsl(${i * 360 / items.length}, 75%, 60%)`;
+                ctx.fillStyle = colorPalette[i % colorPalette.length];
                 ctx.fill();
                 
-                // 繪製微細白線條隔開
-                ctx.strokeStyle = "rgba(255,255,255,0.15)";
-                ctx.lineWidth = 1;
+                // 繪製白線條隔開
+                ctx.strokeStyle = "rgba(255,255,255,0.25)";
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 // 2. 繪製文字 (translate & rotate)
@@ -124,30 +142,46 @@ export const luckyWheelTool = {
                 ctx.rotate(startAngle + arcSize / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "bold 13px Outfit, Microsoft JhengHei";
+                
+                // 根據輪盤大小與項目數量動態調整字型
+                const fontSize = items.length <= 6 ? 16 : items.length <= 10 ? 14 : 12;
+                ctx.font = `bold ${fontSize}px Outfit, Microsoft JhengHei`;
+                
+                // 文字陰影提升可讀性
+                ctx.shadowColor = "rgba(0,0,0,0.4)";
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
                 
                 // 截短過長選項字元避免壓疊
                 let text = items[i];
-                if (text.length > 10) text = text.substring(0, 8) + "...";
+                const maxLen = items.length <= 6 ? 14 : items.length <= 10 ? 10 : 8;
+                if (text.length > maxLen) text = text.substring(0, maxLen - 2) + "...";
                 
-                ctx.fillText(text, radius - 15, 4);
+                ctx.fillText(text, radius - 20, 5);
                 ctx.restore();
             }
 
             ctx.restore();
 
-            // 3. 繪製中心小圓針 (不跟著旋轉)
+            // 3. 繪製中心漸層裝飾圓盤
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
+            gradient.addColorStop(0, isDark ? "#374151" : "#ffffff");
+            gradient.addColorStop(1, isDark ? "#1f2937" : "#f1f5f9");
+            
             ctx.beginPath();
-            ctx.arc(cx, cy, 12, 0, 2 * Math.PI);
-            
-            // 讀取網頁根元素的主題，解耦全域狀態
-            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-            ctx.fillStyle = isDark ? "#1f2937" : "#ffffff";
-            
+            ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
+            ctx.fillStyle = gradient;
             ctx.fill();
-            ctx.strokeStyle = "var(--accent)";
+            ctx.strokeStyle = "rgba(99, 102, 241, 0.5)";
             ctx.lineWidth = 3;
             ctx.stroke();
+
+            // 中心小圓點
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = "#6366f1";
+            ctx.fill();
         };
 
         // 實體旋轉物理減速循環

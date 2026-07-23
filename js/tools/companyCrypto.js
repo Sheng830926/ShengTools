@@ -92,7 +92,7 @@ export const companyCryptoTool = {
             <div class="tool-layout-container">
                 <div class="tool-info-header">
                     <h2 class="tool-name">公司加解密工具</h2>
-                    <p class="tool-description">完全相容專案內部 C# AES 加解密邏輯 (SHA256 Key 衍生、16-byte 補零 IV 與 PKCS7 填補)。</p>
+                    <p class="tool-description">AES 加解密邏輯 (SHA256 Key 衍生、16-byte 補零 IV 與 PKCS7 填補)。</p>
                 </div>
 
                 <!-- 金鑰與 IV 設定面板 -->
@@ -102,17 +102,17 @@ export const companyCryptoTool = {
                             <i class="fa-solid fa-key"></i> Key & IV 金鑰參數設定
                         </h3>
                         <button class="tool-btn tool-btn-secondary" id="companyResetKeysBtn" style="padding: 5px 12px; font-size: 0.8rem;">
-                            <i class="fa-solid fa-rotate-left"></i> 恢復公司預設值
+                            <i class="fa-solid fa-rotate-left"></i> 帶入預設值
                         </button>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="editor-panel">
-                            <label class="editor-label">Key (預設公司統編: 12358067)</label>
+                            <label class="editor-label">Key</label>
                             <input type="text" id="companyKeyInput" class="tool-input-field" value="12358067" placeholder="請輸入 Key..." autocomplete="off">
                         </div>
                         <div class="editor-panel">
-                            <label class="editor-label">IV (預設公司統編: 76085321)</label>
+                            <label class="editor-label">IV</label>
                             <input type="text" id="companyIvInput" class="tool-input-field" value="76085321" placeholder="請輸入 IV..." autocomplete="off">
                         </div>
                     </div>
