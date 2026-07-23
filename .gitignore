@@ -1,4 +1,22 @@
 # ShengTools Git Ignore
-JweHelper.cs
-*.log
+
+# === 系統與編輯器檔案 ===
 .DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# === IDE / 編輯器 ===
+.vscode/
+.idea/
+*.suo
+*.user
+*.sln.docstates
+
+# === 專案排除 ===
+JweHelper.cs
+node_modules/
