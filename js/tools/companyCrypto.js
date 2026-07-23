@@ -92,7 +92,7 @@ export const companyCryptoTool = {
             <div class="tool-layout-container">
                 <div class="tool-info-header">
                     <h2 class="tool-name">公司加解密工具</h2>
-                    <p class="tool-description">完全相容專案內部 C# AES 加解密邏輯 (SHA256 Key 衍生、16-byte 補零 IV 與 PKCS7 填補)。</p>
+                    <p class="tool-description">AES 加解密邏輯 (SHA256 Key 衍生、16-byte 補零 IV 與 PKCS7 填補)。</p>
                 </div>
 
                 <!-- 金鑰與 IV 設定面板 -->
@@ -109,11 +109,11 @@ export const companyCryptoTool = {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="editor-panel">
                             <label class="editor-label">Key</label>
-                            <input type="text" id="companyKeyInput" class="tool-input-field" value="" placeholder="請輸入 Key (留空預設: 12358067)..." autocomplete="off">
+                            <input type="text" id="companyKeyInput" class="tool-input-field" value="" autocomplete="off">
                         </div>
                         <div class="editor-panel">
                             <label class="editor-label">IV</label>
-                            <input type="text" id="companyIvInput" class="tool-input-field" value="" placeholder="請輸入 IV (留空預設: 76085321)..." autocomplete="off">
+                            <input type="text" id="companyIvInput" class="tool-input-field" value="" autocomplete="off">
                         </div>
                     </div>
                 </div>
