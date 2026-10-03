@@ -1983,3 +1983,164 @@ button {
     color: var(--text-primary);
 }
 
+/* --------------------------------------------------------------------------
+   16. Chrome 風格多分頁標籤列 (Multi-Tabs Bar)
+   ========================================================================== */
+.tabs-bar-wrapper {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 16px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    position: sticky;
+    top: 70px;
+    z-index: 75;
+    user-select: none;
+    height: 42px;
+}
+
+.tabs-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1;
+    padding-top: 5px;
+    scroll-behavior: smooth;
+}
+
+.tabs-container::-webkit-scrollbar {
+    height: 3px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-hover);
+    border-radius: var(--radius-full);
+}
+
+.tab-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 0.825rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    max-width: 170px;
+    flex-shrink: 0;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.tab-item:hover {
+    background-color: var(--bg-accent-hover);
+    color: var(--text-primary);
+}
+
+.tab-item.active {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-weight: 600;
+    border-top: 2px solid var(--accent);
+    border-color: var(--accent) var(--border-color) transparent var(--border-color);
+}
+
+.tab-item .tab-icon {
+    font-size: 0.825rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.tab-item.active .tab-icon {
+    color: var(--accent);
+}
+
+.tab-item .tab-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.tab-close-btn {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-left: 2px;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.tab-close-btn:hover {
+    opacity: 1;
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--danger);
+}
+
+.tabs-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 10px;
+    margin-left: 8px;
+    border-left: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.tab-action-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.tab-action-btn:hover {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+#tabCloseAllBtn:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: var(--danger);
+}
+
+@media (max-width: 768px) {
+    .tabs-bar-wrapper {
+        padding: 0 10px;
+        top: 60px;
+    }
+    .tab-item {
+        max-width: 140px;
+        padding: 5px 8px;
+        font-size: 0.775rem;
+    }
+}
+
+

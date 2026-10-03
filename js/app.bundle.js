@@ -5373,7 +5373,8 @@ const appState = {
     searchQuery: "",
     activeToolId: "home",      // 預設路由為 "home"
     selectedCategory: "all",  // 首頁 Tab 選擇，預設為 "all"
-    theme: "dark"              // 預設主題
+    theme: "dark",             // 預設主題
+    openTabs: []               // 開啟的小分頁清單: [{ id, name, icon }]
 };
 
 // --------------------------------------------------------------------------
@@ -5382,6 +5383,7 @@ const appState = {
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();          // 初始化深淺色主題
     initSidebarMobile();  // 初始化手機響應式側邊欄
+    initTabsState();      // 初始化多分頁標籤狀態與動作按鈕
     initSearch();         // 初始化工具搜尋功能
     initRouter();         // 啟動路由監聽
 });
@@ -5460,6 +5462,71 @@ function initSidebarMobile() {
 }
 
 /**
+ * 多分頁標籤 (Tabs) 狀態初始化與快捷控制
+ */
+function initTabsState() {
+    try {
+        const saved = localStorage.getItem("shengtools-open-tabs");
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+                // 僅保留有效存在於 toolsConfig 中的工具
+                appState.openTabs = parsed.filter(t => toolsConfig.some(tool => tool.id === t.id));
+            }
+        }
+    } catch (e) {
+        appState.openTabs = [];
+    }
+
+    const homeBtn = document.getElementById("tabHomeBtn");
+    const closeAllBtn = document.getElementById("tabCloseAllBtn");
+
+    if (homeBtn) {
+        homeBtn.addEventListener("click", () => {
+            window.location.hash = "#/";
+        });
+    }
+
+    if (closeAllBtn) {
+        closeAllBtn.addEventListener("click", () => {
+            if (appState.openTabs.length === 0) return;
+            appState.openTabs = [];
+            saveTabsState();
+            window.location.hash = "#/";
+        });
+    }
+}
+
+function saveTabsState() {
+    try {
+        localStorage.setItem("shengtools-open-tabs", JSON.stringify(appState.openTabs));
+    } catch (e) {}
+}
+
+/**
+ * 關閉指定的分頁
+ */
+function closeTab(tabId) {
+    const idx = appState.openTabs.findIndex(t => t.id === tabId);
+    if (idx === -1) return;
+
+    appState.openTabs.splice(idx, 1);
+    saveTabsState();
+
+    // 如果關閉的是當前作用中的分頁，切換至相鄰分頁或首頁
+    if (appState.activeToolId === tabId) {
+        if (appState.openTabs.length > 0) {
+            const nextIdx = Math.max(0, idx - 1);
+            window.location.hash = `#/${appState.openTabs[nextIdx].id}`;
+        } else {
+            window.location.hash = "#/";
+        }
+    } else {
+        renderTabsBar(appState.activeToolId);
+    }
+}
+
+/**
  * 搜尋過濾
  */
 function initSearch() {
@@ -5504,6 +5571,20 @@ function initRouter() {
         }
 
         appState.activeToolId = toolId;
+
+        // 若進入特定工具，且該工具尚未開啟分頁，自動新增分頁
+        if (toolId !== "home") {
+            const tool = toolsConfig.find(t => t.id === toolId);
+            if (tool && !appState.openTabs.some(t => t.id === toolId)) {
+                appState.openTabs.push({
+                    id: tool.id,
+                    name: tool.name,
+                    icon: tool.icon
+                });
+                saveTabsState();
+            }
+        }
+
         updateView();
     };
 
@@ -5527,7 +5608,79 @@ function updateView() {
     });
 
     renderSidebar(filteredTools, activeId);
+    renderTabsBar(activeId);
     renderContent(filteredTools, activeId);
+}
+
+/**
+ * 多分頁標籤列渲染
+ */
+function renderTabsBar(activeId) {
+    const container = document.getElementById("tabsContainer");
+    if (!container) return;
+
+    const isHomeActive = activeId === "home";
+    let tabsHtml = `
+        <div class="tab-item ${isHomeActive ? 'active' : ''}" data-tab-id="home" title="首頁總覽">
+            <i class="fa-solid fa-house tab-icon"></i>
+            <span class="tab-title">首頁</span>
+        </div>
+    `;
+
+    appState.openTabs.forEach(tab => {
+        const isActive = tab.id === activeId;
+        tabsHtml += `
+            <div class="tab-item ${isActive ? 'active' : ''}" data-tab-id="${tab.id}" title="${tab.name}">
+                <i class="${tab.icon} tab-icon"></i>
+                <span class="tab-title">${tab.name}</span>
+                <button class="tab-close-btn" data-close-id="${tab.id}" title="關閉此分頁">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        `;
+    });
+
+    container.innerHTML = tabsHtml;
+
+    // 平滑滾動至作用中分頁
+    setTimeout(() => {
+        const activeTabEl = container.querySelector(".tab-item.active");
+        if (activeTabEl) {
+            activeTabEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        }
+    }, 50);
+
+    // 點擊分頁切換
+    container.querySelectorAll(".tab-item").forEach(item => {
+        item.addEventListener("click", (e) => {
+            if (e.target.closest(".tab-close-btn")) return;
+            const tabId = item.getAttribute("data-tab-id");
+            if (tabId === "home") {
+                window.location.hash = "#/";
+            } else {
+                window.location.hash = `#/${tabId}`;
+            }
+        });
+
+        // 支援滑鼠中鍵滾輪點擊關閉分頁 (Chrome 體驗)
+        item.addEventListener("auxclick", (e) => {
+            if (e.button === 1) {
+                const tabId = item.getAttribute("data-tab-id");
+                if (tabId !== "home") {
+                    closeTab(tabId);
+                }
+            }
+        });
+    });
+
+    // 點擊關閉按鈕
+    container.querySelectorAll(".tab-close-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const closeId = btn.getAttribute("data-close-id");
+            closeTab(closeId);
+        });
+    });
 }
 
 /**

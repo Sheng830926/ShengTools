@@ -92,6 +92,21 @@
                 </div>
             </header>
             
+            <!-- 多分頁標籤列 (Chrome-like Tab Bar) -->
+            <div class="tabs-bar-wrapper" id="tabsBarWrapper">
+                <div class="tabs-container" id="tabsContainer">
+                    <!-- 分頁標籤項目由 JavaScript 動態生成 -->
+                </div>
+                <div class="tabs-actions">
+                    <button class="tab-action-btn" id="tabHomeBtn" title="回到首頁總覽">
+                        <i class="fa-solid fa-house"></i>
+                    </button>
+                    <button class="tab-action-btn" id="tabCloseAllBtn" title="關閉所有工具分頁">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            
             <!-- 工具主渲染區域 (SPA 內容動態替換) -->
             <div class="tool-viewport" id="toolViewport">
                 <!-- 預設顯示首頁內容，會由 JavaScript 動態載入 -->
