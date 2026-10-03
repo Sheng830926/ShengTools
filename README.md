@@ -22,41 +22,41 @@ ShengTools 是一個專為開發者、設計師及日常文字處理打造的**�
 
 ## ✨ 核心工具與特色功能 (4 大分類，共 20 款工具)
 
-### ✍️ 1. 文字處理 (Text Processing) — 5 款
-| 工具名稱 | ID | 說明 |
-|----------|-----|------|
-| 🔀 文本比對器 | `text-compare` | 並排對照 + 行內字元級差異高亮 + 差異點快速跳轉 |
-| 📝 Markdown 編輯器 | `markdown-editor` | 即時編譯預覽 + HTML 原始碼一鍵複製 |
-| 🧮 字數統計器 | `word-counter` | 中英字元/單字/段落/行數即時統計 |
-| 🔠 大小寫轉換器 | `case-converter` | UPPER / lower / Title / Sentence / camelCase / snake_case |
-| 🔄 文字重複移除工具 | `text-dedup` | 按行/按單字/按字元去重 + 忽略大小寫 + 排序 |
+### ✍️ 1. 文字與格式 (Text & Format) — 6 款
+| 序號 | 工具名稱 | ID | 說明 |
+|:---:|----------|-----|------|
+| 1 | 🔀 文本比對器 | `text-compare` | 並排對照 + 行內字元級差異高亮 + 差異點快速跳轉 |
+| 2 | 🛠️ JSON 格式化與驗證器 | `json-formatter` | 語法高亮、格式化美化、壓縮與樹狀縮排 |
+| 3 | 🧮 字數統計器 | `word-counter` | 中英字元/單字/段落/行數即時統計 |
+| 4 | 🔠 文字大小寫轉換器 | `case-converter` | UPPER / lower / Title / Sentence / camelCase / snake_case |
+| 5 | 🔄 文字重複移除工具 | `text-dedup` | 按行/按單字/按字元去重 + 忽略大小寫 + 排序 |
+| 6 | 📝 Markdown 編輯器 | `markdown-editor` | 即時編譯預覽 + HTML 原始碼一鍵複製 |
 
-### 🔐 2. 安全與加解密 (Security & Crypto) — 5 款
-| 工具名稱 | ID | 說明 |
-|----------|-----|------|
-| 🔐 JWE 加解密工具 | `jwe-helper` | 相容 C# JweHelper.cs，A256KW + A256CBC-HS512 複合認證加密 |
-| 🏢 公司加解密工具 | `company-crypto` | 相容 C# AesEncryptBase64 / AesDecryptBase64，SHA-256 Key 衍生 |
-| #️⃣ Hash 雜湊生成器 | `hash-generator` | MD5 / SHA-1 / SHA-256 / SHA-384 / SHA-512 + HMAC + 比對校驗 |
-| 🔤 Base64 編解碼器 | `base64-codec` | UTF-8 編碼轉換，解決中文亂碼 |
-| 🔗 URL 編解碼器 | `url-codec` | Percent-Encoding 快速轉碼 |
+### 🔐 2. 安全與開發 (Security & Development) — 6 款
+| 序號 | 工具名稱 | ID | 說明 |
+|:---:|----------|-----|------|
+| 7 | 🔐 JWE 加解密工具 | `jwe-helper` | 相容 C# JweHelper.cs，A256KW + A256CBC-HS512 複合認證加密 |
+| 8 | 🏢 公司加解密工具 | `company-crypto` | 相容 C# AesEncryptBase64 / AesDecryptBase64，SHA-256 Key 衍生 |
+| 9 | #️⃣ Hash 雜湊生成器 | `hash-generator` | MD5 / SHA-1 / SHA-256 / SHA-384 / SHA-512 + HMAC + 比對校驗 |
+| 10 | 🔤 Base64 編解碼器 | `base64-codec` | UTF-8 編碼轉換，解決中文亂碼 |
+| 11 | 🔗 URL 編解碼器 | `url-codec` | Percent-Encoding 快速轉碼 |
+| 12 | 🔍 正規表達式測試器 | `regex-tester` | Pattern / Flags 設定，即時高亮匹配區段 |
 
-### 🎨 3. 實用與設計 (Utility & Design) — 5 款
-| 工具名稱 | ID | 說明 |
-|----------|-----|------|
-| 🎨 色彩工具與調色盤 | `color-tools` | HEX / RGB / HSL 互轉 + 螢幕 EyeDropper 取色 |
-| 📱 QR Code 生成器 | `qr-generator` | 即時二維碼生成 + 多尺寸 + 一鍵下載 PNG |
-| 🎰 幸運抽籤輪盤 | `lucky-wheel` | 自訂選項 + 物理減速旋轉動畫 + 中獎宣告 |
-| 📅 日期計算器 | `date-calculator` | 日期差距 (天/時/週/月/年) + 工作天 + 加減推算 |
-| 💱 貨幣轉換器 | `currency-converter` | 30+ 種貨幣即時匯率換算，快速切換與匯率一覽表 |
+### 🛠️ 3. 實用與生活 (Utility & Daily) — 6 款
+| 序號 | 工具名稱 | ID | 說明 |
+|:---:|----------|-----|------|
+| 13 | 💱 貨幣轉換器 | `currency-converter` | 30+ 種貨幣即時匯率換算，快速切換與匯率一覽表 |
+| 14 | 📅 日期計算器 | `date-calculator` | 日期差距 (天/時/週/月/年) + 工作天 + 加減推算 |
+| 15 | 🔢 進制與單位轉換器 | `converter-box` | 二/八/十/十六進制 + 長度/重量/溫度/面積度量 |
+| 16 | 🎨 色彩工具與調色盤 | `color-tools` | HEX / RGB / HSL 互轉 + 螢幕 EyeDropper 取色 |
+| 17 | 🎰 幸運抽籤輪盤 | `lucky-wheel` | 自訂選項 + 物理減速旋轉動畫 + 中獎宣告 |
+| 18 | 📱 QR Code 生成器 | `qr-generator` | 即時二維碼生成 + 多尺寸 + 一鍵下載 PNG |
 
-### 💻 4. 開發與網路 (Dev & Network) — 5 款
-| 工具名稱 | ID | 說明 |
-|----------|-----|------|
-| 🌐 HTTP 狀態碼對照表 | `http-status` | 1xx～5xx 全套收錄，含常見原因、修復建議、RFC 說明 |
-| 📄 MIME 類型對照表 | `mime-type` | 80+ 種 MIME 類型，涵蓋文本/圖片/影音/字型/壓縮檔/Office |
-| 🛠️ JSON 格式化驗證器 | `json-formatter` | 語法高亮、格式化美化、壓縮與樹狀縮排 |
-| 🔍 正規表達式測試器 | `regex-tester` | Pattern / Flags 設定，即時高亮匹配區段 |
-| 🔢 進制與單位轉換器 | `converter-box` | 二/八/十/十六進制 + 長度/重量/溫度/面積度量 |
+### 🌐 4. 網路與查詢 (Network & Lookup) — 2 款
+| 序號 | 工具名稱 | ID | 說明 |
+|:---:|----------|-----|------|
+| 19 | 🌐 HTTP 狀態碼對照表 | `http-status` | 1xx～5xx 全套收錄，含常見原因、修復建議、RFC 說明 |
+| 20 | 📄 MIME 類型對照表 | `mime-type` | 80+ 種 MIME 類型，涵蓋文本/圖片/影音/字型/壓縮檔/Office |
 
 ---
 
@@ -64,8 +64,8 @@ ShengTools 是一個專為開發者、設計師及日常文字處理打造的**�
 
 | 特性 | 說明 |
 |------|------|
-| **Zero-Build** | 瀏覽器原生 ES Modules，無需 Node.js / Vite / Webpack |
-| **模組化架構** | 每款工具為 `js/tools/*.js` 獨立模組，易維護易擴充 |
+| **雙模式載入** | 支援本地直接雙擊 `index.html` (100% 離線可用)，亦支援線上伺服器部署 |
+| **模組化架構** | 每款工具皆為 `js/tools/*.js` 獨立模組，易維護易擴充 |
 | **深淺主題** | 全域 Dark / Light Theme 切換，`localStorage` 記憶偏好 |
 | **響應式** | 桌面側邊欄收合 (74px)、行動端漢堡選單、1600px 寬版 |
 | **安全加密** | WebCrypto API 原生加解密，所有數據不離開瀏覽器 |
@@ -76,45 +76,48 @@ ShengTools 是一個專為開發者、設計師及日常文字處理打造的**�
 
 ```text
 ShengTools/
-├── index.html                   # 主要 HTML 進入點
+├── index.html                   # 主要 HTML 進入點 (直接雙擊即可離線執行)
 ├── styles.css                   # 全域 CSS 樣式與主題變數
 ├── README.md                    # 專案說明文件 (本檔案)
 ├── LICENSE                      # MIT 授權條款
 ├── .gitignore                   # Git 忽略設定
 ├── .nojekyll                    # GitHub Pages 略過 Jekyll 建置
+├── build.js                     # 離線打包腳本 (自動產出 app.bundle.js)
+├── package.json                 # 專案設定檔
 └── js/
     ├── app.js                   # 核心控制引擎 (路由、主題、側邊欄)
-    ├── toolsConfig.js           # 工具總冊註冊清單 (依 4 大分類排序)
+    ├── app.bundle.js            # 整合打包腳本 (支援 file:// 本地離線秒開)
+    ├── toolsConfig.js           # 工具總冊註冊清單 (依指定順序排列)
     └── tools/
         ├── utils.js             # 共用函式 (LCS Diff、Markdown、色彩轉換)
         │
-        │  ── 1. 文字處理 ──
-        ├── textCompare.js       # 文本比對器 (含行內字元差異)
-        ├── markdownEditor.js    # Markdown 編輯器
-        ├── wordCounter.js       # 字數統計器
-        ├── caseConverter.js     # 文字大小寫轉換器
-        ├── textDedup.js         # 文字重複移除工具
+        │  ── 1. 文字與格式 ──
+        ├── textCompare.js       # 1. 文本比對器 (含行內字元差異)
+        ├── jsonFormatter.js     # 2. JSON 格式化與驗證器
+        ├── wordCounter.js       # 3. 字數統計器
+        ├── caseConverter.js     # 4. 文字大小寫轉換器
+        ├── textDedup.js         # 5. 文字重複移除工具
+        ├── markdownEditor.js    # 6. Markdown 編輯器
         │
-        │  ── 2. 安全與加解密 ──
-        ├── jweHelper.js         # JWE 加解密 (A256KW + A256CBC-HS512)
-        ├── companyCrypto.js     # 公司 AES-256-CBC 加解密 (Key/IV 預設留空)
-        ├── hashGenerator.js     # Hash 雜湊生成器 (MD5 / SHA / HMAC)
-        ├── base64Codec.js       # Base64 編解碼器
-        ├── urlCodec.js          # URL 編解碼器
+        │  ── 2. 安全與開發 ──
+        ├── jweHelper.js         # 7. JWE 加解密 (A256KW + A256CBC-HS512)
+        ├── companyCrypto.js     # 8. 公司 AES-256-CBC 加解密 (Key/IV 預設留空)
+        ├── hashGenerator.js     # 9. Hash 雜湊生成器 (MD5 / SHA / HMAC)
+        ├── base64Codec.js       # 10. Base64 編解碼器
+        ├── urlCodec.js          # 11. URL 編解碼器
+        ├── regexTester.js       # 12. 正規表達式測試器
         │
-        │  ── 3. 實用與設計 ──
-        ├── colorTools.js        # 色彩工具與調色盤
-        ├── qrGenerator.js       # QR Code 生成器
-        ├── luckyWheel.js        # 幸運抽籤輪盤
-        ├── dateCalculator.js    # 日期計算器
-        ├── currencyConverter.js # 貨幣轉換器
+        │  ── 3. 實用與生活 ──
+        ├── currencyConverter.js # 13. 貨幣轉換器
+        ├── dateCalculator.js    # 14. 日期計算器
+        ├── converterBox.js      # 15. 進制與單位轉換器
+        ├── colorTools.js        # 16. 色彩工具與調色盤
+        ├── luckyWheel.js        # 17. 幸運抽籤輪盤
+        ├── qrGenerator.js       # 18. QR Code 生成器
         │
-        │  ── 4. 開發與網路 ──
-        ├── httpStatus.js        # HTTP 狀態碼對照表
-        ├── mimeType.js          # MIME 類型查詢對照表 (80+ 種)
-        ├── jsonFormatter.js     # JSON 格式化工具
-        ├── regexTester.js       # 正規表達式測試器
-        └── converterBox.js      # 進制與單位轉換器
+        │  ── 4. 網路與查詢 ──
+        ├── httpStatus.js        # 19. HTTP 狀態碼對照表
+        └── mimeType.js          # 20. MIME 類型對照表 (80+ 種)
 ```
 
 ---

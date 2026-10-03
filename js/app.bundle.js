@@ -238,7 +238,7 @@ const textCompareTool = {
     id: "text-compare",
     name: "文本比對器",
     icon: "fa-solid fa-code-compare",
-    category: "文字處理",
+    category: "文字與格式",
     description: "雙欄並排對比文字差異，同一行內高亮標示細微差異字元，支援左右雙向同步滾動與差異點快速跳轉。",
     render: (container) => {
         container.innerHTML = `
@@ -531,108 +531,117 @@ return textCompareTool;
 })();
 
 // ==========================================
-// Tool: markdownEditorTool (markdownEditor.js)
+// Tool: jsonFormatterTool (jsonFormatter.js)
 // ==========================================
-const markdownEditorTool = (function() {
+const jsonFormatterTool = (function() {
 /**
- * ShengTools - Markdown 編輯器
+ * ShengTools - JSON 格式化與驗證
  */
-
-
-const markdownEditorTool = {
-    id: "markdown-editor",
-    name: "Markdown 編輯器",
-    icon: "fa-solid fa-file-pen",
-    category: "文字處理",
-    description: "線上 Markdown 即時編輯排版與預覽，支援標題、代碼塊、粗體與引用語法。",
+const jsonFormatterTool = {
+    id: "json-formatter",
+    name: "JSON 格式化與驗證",
+    icon: "fa-solid fa-code",
+    category: "文字與格式",
+    description: "美化排版 JSON 數據，支援一鍵壓縮、結構驗證與語法錯誤即時提示。",
     render: (container) => {
         container.innerHTML = `
             <div class="tool-layout-container">
                 <div class="tool-info-header">
-                    <h2 class="tool-name">Markdown 編輯器</h2>
-                    <p class="tool-description">在左欄輸入 Markdown 語法，右欄將會即時進行排版編譯與預覽。</p>
+                    <h2 class="tool-name">JSON 格式化與驗證</h2>
+                    <p class="tool-description">在左側貼上要處理的 JSON 內容，點擊「格式化」或「壓縮」進行排版。</p>
                 </div>
                 
                 <div class="tool-grid-2col">
                     <div class="editor-panel">
-                        <div class="editor-label">編輯 Markdown 原始碼</div>
-                        <div class="editor-textarea-wrapper" style="height:400px;">
-                            <textarea id="mdInput" style="height:100%" placeholder="在此輸入 Markdown 內容..."></textarea>
+                        <div class="editor-label">
+                            <span>原始 JSON 輸入</span>
+                            <span class="category-count-badge">INPUT</span>
+                        </div>
+                        <div class="editor-textarea-wrapper">
+                            <textarea id="jsonInput" placeholder="請貼上您的 JSON 字串..."></textarea>
                         </div>
                     </div>
                     <div class="editor-panel">
-                        <div class="editor-label">即時預覽效果 (Preview)</div>
-                        <div class="markdown-preview-box" id="mdPreview" style="height:426px;">
-                            <span style="color:var(--text-muted)">等待輸入 Markdown...</span>
+                        <div class="editor-label">
+                            <span>輸出結果</span>
+                            <span class="category-count-badge">OUTPUT</span>
+                        </div>
+                        <div class="editor-textarea-wrapper">
+                            <textarea id="jsonOutput" placeholder="處理結果將在此顯示..." readonly></textarea>
                         </div>
                     </div>
                 </div>
                 
+                <div class="error-msg-box" id="jsonError"></div>
+                
                 <div class="tool-actions-row">
-                    <button class="tool-btn tool-btn-secondary" id="clearMdBtn">
-                        <i class="fa-solid fa-trash-can"></i>清除
+                    <button class="tool-btn tool-btn-secondary" id="clearJsonBtn">
+                        <i class="fa-solid fa-trash-can"></i>一鍵清除
                     </button>
-                    <button class="tool-btn tool-btn-secondary" id="loadTemplateMdBtn">
-                        <i class="fa-solid fa-file-circle-plus"></i>載入範本
+                    <button class="tool-btn tool-btn-secondary" id="minifyJsonBtn">
+                        <i class="fa-solid fa-compress"></i>壓縮 JSON
                     </button>
-                    <button class="tool-btn tool-btn-primary" id="copyHtmlBtn">
-                        <i class="fa-solid fa-copy"></i>複製 HTML 原始碼
+                    <button class="tool-btn tool-btn-primary" id="formatJsonBtn">
+                        <i class="fa-solid fa-code"></i>格式化 JSON
+                    </button>
+                    <button class="tool-btn tool-btn-primary" id="copyJsonBtn">
+                        <i class="fa-solid fa-copy"></i>複製結果
                     </button>
                 </div>
             </div>
         `;
 
-        const input = container.querySelector("#mdInput");
-        const preview = container.querySelector("#mdPreview");
-        const clearBtn = container.querySelector("#clearMdBtn");
-        const templateBtn = container.querySelector("#loadTemplateMdBtn");
-        const copyBtn = container.querySelector("#copyHtmlBtn");
+        const input = container.querySelector("#jsonInput");
+        const output = container.querySelector("#jsonOutput");
+        const errorBox = container.querySelector("#jsonError");
+        const formatBtn = container.querySelector("#formatJsonBtn");
+        const minifyBtn = container.querySelector("#minifyJsonBtn");
+        const clearBtn = container.querySelector("#clearJsonBtn");
+        const copyBtn = container.querySelector("#copyJsonBtn");
 
-        const updatePreview = () => {
-            preview.innerHTML = compileMarkdown(input.value);
+        const processJson = (format) => {
+            const val = input.value.trim();
+            if (!val) {
+                output.value = "";
+                errorBox.style.display = "none";
+                return;
+            }
+            try {
+                const parsed = JSON.parse(val);
+                errorBox.style.display = "none";
+                if (format) {
+                    output.value = JSON.stringify(parsed, null, 4);
+                } else {
+                    output.value = JSON.stringify(parsed);
+                }
+            } catch (e) {
+                errorBox.textContent = `❌ 解析失敗：${e.message}`;
+                errorBox.style.display = "block";
+                output.value = "";
+            }
         };
 
-        input.addEventListener("input", updatePreview);
-
+        formatBtn.addEventListener("click", () => processJson(true));
+        minifyBtn.addEventListener("click", () => processJson(false));
         clearBtn.addEventListener("click", () => {
             input.value = "";
-            updatePreview();
+            output.value = "";
+            errorBox.style.display = "none";
             input.focus();
         });
 
-        templateBtn.addEventListener("click", () => {
-            input.value = `# 歡迎使用 ShengTools Markdown 編輯器
-這是一個原生 JS 實作的輕量級 **Markdown** 編譯預覽工具。
-
-## 支援的語法特性：
-- **粗體文字** 與 *斜體文字*
-- \`行內程式碼\` 或是程式碼區塊
-
-> 這是一個 Blockquote 引用區塊，非常適合標記重點提示。
-
-- 支援項目列表 A
-- 支援項目列表 B
-- 超連結支援：[點擊前往 Google](https://google.com)
-
-歡迎在左側自由編輯！`;
-            updatePreview();
-        });
-
         copyBtn.addEventListener("click", () => {
-            const htmlCode = preview.innerHTML;
-            if (htmlCode.includes("等待輸入 Markdown")) return;
-            navigator.clipboard.writeText(htmlCode).then(() => {
+            if (!output.value) return;
+            navigator.clipboard.writeText(output.value).then(() => {
                 const originalText = copyBtn.innerHTML;
                 copyBtn.innerHTML = `<i class="fa-solid fa-check"></i>已複製！`;
                 setTimeout(() => copyBtn.innerHTML = originalText, 1500);
             });
         });
-
-        templateBtn.click();
     }
 };
 
-return markdownEditorTool;
+return jsonFormatterTool;
 })();
 
 // ==========================================
@@ -646,7 +655,7 @@ const wordCounterTool = {
     id: "word-counter",
     name: "字數統計器",
     icon: "fa-solid fa-calculator",
-    category: "文字處理",
+    category: "文字與格式",
     description: "即時統計文章字數、字元數（含/不含空白）、英文單字數、段落數與行數，支援一鍵清除與複製。",
     render: (container) => {
         container.innerHTML = `
@@ -766,7 +775,7 @@ const caseConverterTool = {
     id: "case-converter",
     name: "文字大小寫轉換器",
     icon: "fa-solid fa-font",
-    category: "文字處理",
+    category: "文字與格式",
     description: "快速轉換英文大小寫，支援 UPPERCASE、lowercase、Title Case、Sentence Case、camelCase、snake_case。",
     render: (container) => {
         container.innerHTML = `
@@ -928,7 +937,7 @@ const textDedupTool = {
     id: "text-dedup",
     name: "文字重複移除工具",
     icon: "fa-solid fa-filter-circle-xmark",
-    category: "文字處理",
+    category: "文字與格式",
     description: "快速移除文字中的重複行、重複單字或重複字元，支援多種去重模式與排序選項。",
     render: (container) => {
         container.innerHTML = `
@@ -1484,6 +1493,111 @@ return textDedupTool;
 })();
 
 // ==========================================
+// Tool: markdownEditorTool (markdownEditor.js)
+// ==========================================
+const markdownEditorTool = (function() {
+/**
+ * ShengTools - Markdown 編輯器
+ */
+
+
+const markdownEditorTool = {
+    id: "markdown-editor",
+    name: "Markdown 編輯器",
+    icon: "fa-solid fa-file-pen",
+    category: "文字與格式",
+    description: "線上 Markdown 即時編輯排版與預覽，支援標題、代碼塊、粗體與引用語法。",
+    render: (container) => {
+        container.innerHTML = `
+            <div class="tool-layout-container">
+                <div class="tool-info-header">
+                    <h2 class="tool-name">Markdown 編輯器</h2>
+                    <p class="tool-description">在左欄輸入 Markdown 語法，右欄將會即時進行排版編譯與預覽。</p>
+                </div>
+                
+                <div class="tool-grid-2col">
+                    <div class="editor-panel">
+                        <div class="editor-label">編輯 Markdown 原始碼</div>
+                        <div class="editor-textarea-wrapper" style="height:400px;">
+                            <textarea id="mdInput" style="height:100%" placeholder="在此輸入 Markdown 內容..."></textarea>
+                        </div>
+                    </div>
+                    <div class="editor-panel">
+                        <div class="editor-label">即時預覽效果 (Preview)</div>
+                        <div class="markdown-preview-box" id="mdPreview" style="height:426px;">
+                            <span style="color:var(--text-muted)">等待輸入 Markdown...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-actions-row">
+                    <button class="tool-btn tool-btn-secondary" id="clearMdBtn">
+                        <i class="fa-solid fa-trash-can"></i>清除
+                    </button>
+                    <button class="tool-btn tool-btn-secondary" id="loadTemplateMdBtn">
+                        <i class="fa-solid fa-file-circle-plus"></i>載入範本
+                    </button>
+                    <button class="tool-btn tool-btn-primary" id="copyHtmlBtn">
+                        <i class="fa-solid fa-copy"></i>複製 HTML 原始碼
+                    </button>
+                </div>
+            </div>
+        `;
+
+        const input = container.querySelector("#mdInput");
+        const preview = container.querySelector("#mdPreview");
+        const clearBtn = container.querySelector("#clearMdBtn");
+        const templateBtn = container.querySelector("#loadTemplateMdBtn");
+        const copyBtn = container.querySelector("#copyHtmlBtn");
+
+        const updatePreview = () => {
+            preview.innerHTML = compileMarkdown(input.value);
+        };
+
+        input.addEventListener("input", updatePreview);
+
+        clearBtn.addEventListener("click", () => {
+            input.value = "";
+            updatePreview();
+            input.focus();
+        });
+
+        templateBtn.addEventListener("click", () => {
+            input.value = `# 歡迎使用 ShengTools Markdown 編輯器
+這是一個原生 JS 實作的輕量級 **Markdown** 編譯預覽工具。
+
+## 支援的語法特性：
+- **粗體文字** 與 *斜體文字*
+- \`行內程式碼\` 或是程式碼區塊
+
+> 這是一個 Blockquote 引用區塊，非常適合標記重點提示。
+
+- 支援項目列表 A
+- 支援項目列表 B
+- 超連結支援：[點擊前往 Google](https://google.com)
+
+歡迎在左側自由編輯！`;
+            updatePreview();
+        });
+
+        copyBtn.addEventListener("click", () => {
+            const htmlCode = preview.innerHTML;
+            if (htmlCode.includes("等待輸入 Markdown")) return;
+            navigator.clipboard.writeText(htmlCode).then(() => {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = `<i class="fa-solid fa-check"></i>已複製！`;
+                setTimeout(() => copyBtn.innerHTML = originalText, 1500);
+            });
+        });
+
+        templateBtn.click();
+    }
+};
+
+return markdownEditorTool;
+})();
+
+// ==========================================
 // Tool: jweHelperTool (jweHelper.js)
 // ==========================================
 const jweHelperTool = (function() {
@@ -1636,7 +1750,7 @@ const jweHelperTool = {
     id: "jwe-helper",
     name: "JWE 加解密工具",
     icon: "fa-solid fa-user-shield",
-    category: "安全與加解密",
+    category: "安全與開發",
     description: "基於 JweHelper.cs 規範（A256KW + A256CBC-HS512），支援輸入 aPart 與 bPart 金鑰進行 JWE JSON 加密與解密。",
     render: (container) => {
         container.innerHTML = `
@@ -2067,7 +2181,7 @@ const companyCryptoTool = {
     id: "company-crypto",
     name: "公司加解密工具",
     icon: "fa-solid fa-building-lock",
-    category: "安全與加解密",
+    category: "安全與開發",
     description: "相容 C# AesEncryptBase64 / AesDecryptBase64 專案內部 AES-256-CBC 加解密，支援自訂 Key 與 IV。",
     render: (container) => {
         container.innerHTML = `
@@ -2417,7 +2531,7 @@ const hashGeneratorTool = {
     id: "hash-generator",
     name: "Hash 雜湊生成器",
     icon: "fa-solid fa-hashtag",
-    category: "安全與加解密",
+    category: "安全與開發",
     description: "支援 MD5, SHA-1, SHA-256, SHA-384, SHA-512 雜湊演算法與 HMAC 金鑰簽章驗證。",
     render: (container) => {
         container.innerHTML = `
@@ -2630,7 +2744,7 @@ const base64CodecTool = {
     id: "base64-codec",
     name: "Base64 編解碼器",
     icon: "fa-solid fa-key",
-    category: "安全與加解密",
+    category: "安全與開發",
     description: "對文字字串進行 Base64 的編碼與解碼，完整支援萬國碼 (UTF-8) 不會產生亂碼。",
     render: (container) => {
         container.innerHTML = `
@@ -2746,7 +2860,7 @@ const urlCodecTool = {
     id: "url-codec",
     name: "URL 編解碼器",
     icon: "fa-solid fa-link",
-    category: "安全與加解密",
+    category: "安全與開發",
     description: "將網址查詢參數 (Query String) 進行 URL Percent-Encoding 編碼與解碼。",
     render: (container) => {
         container.innerHTML = `
@@ -2848,807 +2962,117 @@ return urlCodecTool;
 })();
 
 // ==========================================
-// Tool: colorToolsTool (colorTools.js)
+// Tool: regexTesterTool (regexTester.js)
 // ==========================================
-const colorToolsTool = (function() {
+const regexTesterTool = (function() {
 /**
- * ShengTools - 色彩工具與調色盤
+ * ShengTools - 正規表達式測試器
  */
 
 
-const colorToolsTool = {
-    id: "color-tools",
-    name: "色彩工具與調色盤",
-    icon: "fa-solid fa-palette",
-    category: "實用與設計",
-    description: "色彩選擇器、HEX/RGB/HSL 色碼互轉，並自動計算相鄰色與補色調色盤。",
+const regexTesterTool = {
+    id: "regex-tester",
+    name: "正規表達式測試器",
+    icon: "fa-solid fa-magnifying-glass-chart",
+    category: "安全與開發",
+    description: "輸入 RegExp 正則與測試文字，即時預覽高亮匹配的區段與結果。",
     render: (container) => {
         container.innerHTML = `
             <div class="tool-layout-container">
                 <div class="tool-info-header">
-                    <h2 class="tool-name">色彩工具與調色盤</h2>
-                    <p class="tool-description">色彩選擇器、HEX/RGB/HSL 色碼互轉，支援隨機生成色碼與原生螢幕滴管取色。</p>
+                    <h2 class="tool-name">正規表達式測試器</h2>
+                    <p class="tool-description">在上方輸入 Pattern，右下方即時高亮顯示符合正規條件的字串。</p>
                 </div>
                 
-                <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-top:10px;">
-                    <div class="color-picker-section">
-                        <div class="native-color-picker-wrapper">
-                            <input type="color" id="colorPicker" value="#6366f1">
+                <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: grid; grid-template-columns: 1fr 240px; gap: 16px; align-items: flex-end;">
+                        <div class="editor-panel">
+                            <label class="editor-label">正則表達式 Pattern (不用寫 / )</label>
+                            <input type="text" id="regexPattern" class="tool-input-field" placeholder="例如：[0-9]+ 或 \\w+@\\w+\\.\\w+">
                         </div>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
-                            <div class="editor-panel">
-                                <label class="editor-label">HEX</label>
-                                <input type="text" id="colorHex" class="tool-input-field" value="#6366F1">
-                            </div>
-                            <div class="editor-panel">
-                                <label class="editor-label">RGB</label>
-                                <input type="text" id="colorRgb" class="tool-input-field" value="rgb(99, 102, 241)">
-                            </div>
-                            <div class="editor-panel">
-                                <label class="editor-label">HSL</label>
-                                <input type="text" id="colorHsl" class="tool-input-field" value="hsl(239, 84%, 67%)">
+                        <div class="editor-panel">
+                            <label class="editor-label">匹配 Flags</label>
+                            <div class="regex-flags-container" style="padding: 10px 0;">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="regexFlagG" checked> Global (g)
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="regexFlagI" checked> Ignore Case (i)
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="regexFlagM"> Multiline (m)
+                                </label>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="tool-actions-row" style="margin-top: 20px; justify-content: flex-start;">
-                        <button class="tool-btn tool-btn-secondary" id="randomColorBtn">
-                            <i class="fa-solid fa-dice"></i> 隨機生成顏色
-                        </button>
-                        <button class="tool-btn tool-btn-primary" id="eyeDropperBtn" style="display: none;">
-                            <i class="fa-solid fa-eye-dropper"></i> 螢幕取色器
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="color-palette-card">
-                    <h3 class="palette-section-title">
-                        <i class="fa-solid fa-swatchbook"></i> 推薦配色調色盤
-                    </h3>
-                    <div class="color-swatch-grid" id="colorPaletteGrid"></div>
-                </div>
-            </div>
-        `;
-
-        const picker = container.querySelector("#colorPicker");
-        const hexInput = container.querySelector("#colorHex");
-        const rgbInput = container.querySelector("#colorRgb");
-        const hslInput = container.querySelector("#colorHsl");
-        const paletteGrid = container.querySelector("#colorPaletteGrid");
-        const randomBtn = container.querySelector("#randomColorBtn");
-        const eyedropperBtn = container.querySelector("#eyeDropperBtn");
-
-        const updateColors = (hexVal) => {
-            picker.value = hexVal;
-            hexInput.value = hexVal;
-            const rgb = hexToRgb(hexVal);
-            if (rgb) {
-                rgbInput.value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-                hslInput.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
-                generatePalette(hsl.h, hsl.s, hsl.l);
-            }
-        };
-
-        const generatePalette = (h, s, l) => {
-            const colors = [
-                { h: h, s: s, l: l },
-                { h: (h + 30) % 360, s: s, l: l },
-                { h: (h + 180) % 360, s: s, l: l },
-                { h: (h + 210) % 360, s: s, l: l },
-                { h: h, s: Math.max(10, s - 15), l: Math.min(90, l + 15) }
-            ];
-
-            paletteGrid.innerHTML = colors.map(hslObj => {
-                const rgbObj = hslToRgb(hslObj.h, hslObj.s, hslObj.l);
-                const hexStr = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
-                return `
-                    <div class="color-swatch" data-hex="${hexStr}">
-                        <div class="color-swatch-block" style="background-color: ${hexStr}"></div>
-                        <span class="color-swatch-hex">${hexStr}</span>
-                    </div>
-                `;
-            }).join("");
-
-            paletteGrid.querySelectorAll(".color-swatch").forEach(swatch => {
-                swatch.addEventListener("click", () => {
-                    const hexToCopy = swatch.getAttribute("data-hex");
-                    navigator.clipboard.writeText(hexToCopy).then(() => {
-                        const label = swatch.querySelector(".color-swatch-hex");
-                        const original = label.textContent;
-                        label.textContent = "已複製！";
-                        label.style.color = "var(--success)";
-                        setTimeout(() => {
-                            label.textContent = original;
-                            label.style.color = "";
-                        }, 1000);
-                    });
-                });
-            });
-        };
-
-        picker.addEventListener("input", (e) => updateColors(e.target.value.toUpperCase()));
-        hexInput.addEventListener("input", (e) => {
-            const hex = e.target.value.trim();
-            if (/^#[0-9A-F]{6}$/i.test(hex)) updateColors(hex.toUpperCase());
-        });
-        rgbInput.addEventListener("input", (e) => {
-            const rgbMatch = e.target.value.match(/\d+/g);
-            if (rgbMatch && rgbMatch.length >= 3) {
-                const hex = rgbToHex(parseInt(rgbMatch[0]), parseInt(rgbMatch[1]), parseInt(rgbMatch[2]));
-                updateColors(hex);
-            }
-        });
-
-        // 1. 隨機顏色生成
-        randomBtn.addEventListener("click", () => {
-            const randomHex = rgbToHex(
-                Math.floor(Math.random() * 256),
-                Math.floor(Math.random() * 256),
-                Math.floor(Math.random() * 256)
-            );
-            updateColors(randomHex);
-        });
-
-        // 2. 螢幕取色器 (Eye Dropper API)
-        if ("EyeDropper" in window) {
-            eyedropperBtn.style.display = "flex";
-            eyedropperBtn.addEventListener("click", () => {
-                const eyeDropper = new EyeDropper();
-                eyeDropper.open()
-                    .then(result => {
-                        updateColors(result.sRGBHex.toUpperCase());
-                    })
-                    .catch(err => {
-                        console.log("EyeDropper 取得顏色取消或失敗:", err);
-                    });
-            });
-        }
-
-        updateColors("#6366F1");
-    }
-};
-
-return colorToolsTool;
-})();
-
-// ==========================================
-// Tool: qrGeneratorTool (qrGenerator.js)
-// ==========================================
-const qrGeneratorTool = (function() {
-/**
- * ShengTools - QR Code 生成器
- */
-const qrGeneratorTool = {
-    id: "qr-generator",
-    name: "QR Code 生成器",
-    icon: "fa-solid fa-qrcode",
-    category: "實用與設計",
-    description: "輸入任意文字或網址 URL 即時生成 QR Code 二維碼，支援自訂多種尺寸並可一鍵下載。",
-    render: (container) => {
-        container.innerHTML = `
-            <div class="tool-layout-container">
-                <div class="tool-info-header">
-                    <h2 class="tool-name">QR Code 生成器</h2>
-                    <p class="tool-description">輸入網址或文字，系統會即時為您生成二維碼。此二維碼是在瀏覽器本地調用 API 生成，安全、快捷。</p>
+                    <div class="error-msg-box" id="regexError"></div>
                 </div>
                 
                 <div class="tool-grid-2col">
                     <div class="editor-panel">
-                        <div class="editor-label">輸入 QR Code 內容 (網址或純文字)</div>
-                        <div class="editor-textarea-wrapper" style="height:120px;">
-                            <textarea id="qrInputText" style="height:100%" placeholder="在此輸入文字，例如：https://google.com"></textarea>
-                        </div>
-                        
-                        <div class="editor-label" style="margin-top:16px;">圖片尺寸選擇 (像素)</div>
-                        <select id="qrSizeSelect" class="tool-select-field">
-                            <option value="150">150 x 150 px</option>
-                            <option value="200" selected>200 x 200 px</option>
-                            <option value="250">250 x 250 px</option>
-                            <option value="300">300 x 300 px</option>
-                            <option value="400">400 x 400 px</option>
-                        </select>
-                        
-                        <div style="margin-top:24px;">
-                            <button class="tool-btn tool-btn-primary" id="downloadQrBtn" style="width:100%; justify-content:center;">
-                                <i class="fa-solid fa-download"></i> 下載 QR Code 圖片
-                            </button>
+                        <div class="editor-label">測試文本 (Test String)</div>
+                        <div class="editor-textarea-wrapper">
+                            <textarea id="regexInput" placeholder="在此貼上要進行測試的文字內容..."></textarea>
                         </div>
                     </div>
-                    
                     <div class="editor-panel">
-                        <div class="editor-label">即時 QR Code 預覽</div>
-                        <div class="qr-preview-card">
-                            <div class="qr-image-wrapper" id="qrImageWrapper">
-                                <img id="qrImage" src="" alt="QR Code 預覽區">
-                            </div>
-                            <span class="color-swatch-hex" style="color:var(--text-muted)">使用手機相機即可直接掃描讀取</span>
-                        </div>
+                        <div class="editor-label">匹配高亮結果 (Result)</div>
+                        <div class="regex-highlight-result" id="regexHighlightResult">匹配結果將在此高亮顯示...</div>
                     </div>
                 </div>
             </div>
         `;
 
-        const input = container.querySelector("#qrInputText");
-        const sizeSelect = container.querySelector("#qrSizeSelect");
-        const qrImg = container.querySelector("#qrImage");
-        const downloadBtn = container.querySelector("#downloadQrBtn");
+        const patternInput = container.querySelector("#regexPattern");
+        const testText = container.querySelector("#regexInput");
+        const resultPanel = container.querySelector("#regexHighlightResult");
+        const flagG = container.querySelector("#regexFlagG");
+        const flagI = container.querySelector("#regexFlagI");
+        const flagM = container.querySelector("#regexFlagM");
+        const errorBox = container.querySelector("#regexError");
 
-        const updateQrCode = () => {
-            const text = input.value.trim();
-            const size = sizeSelect.value;
-            
-            if (!text) {
-                const defaultUrl = "https://github.com";
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(defaultUrl)}`;
-                return;
-            }
-            
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
-        };
+        const performMatch = () => {
+            const pattern = patternInput.value;
+            const text = testText.value;
+            errorBox.style.display = "none";
 
-        input.addEventListener("input", updateQrCode);
-        sizeSelect.addEventListener("change", updateQrCode);
-
-        downloadBtn.addEventListener("click", () => {
-            const text = input.value.trim();
-            if (!text) {
-                alert("請先在左側輸入要生成的內容再進行下載！");
+            if (!pattern) {
+                resultPanel.textContent = text || "等待測試文字輸入...";
                 return;
             }
 
-            const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 下載中...`;
+            try {
+                let flags = "";
+                if (flagG.checked) flags += "g";
+                if (flagI.checked) flags += "i";
+                if (flagM.checked) flags += "m";
 
-            fetch(qrImg.src)
-                .then(res => res.blob())
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `shengtools_qrcode_${Date.now()}.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                    
-                    downloadBtn.innerHTML = `<i class="fa-solid fa-check"></i> 下載成功！`;
-                    downloadBtn.style.background = "var(--success)";
-                    
-                    setTimeout(() => {
-                        downloadBtn.innerHTML = originalText;
-                        downloadBtn.style.background = "";
-                    }, 1500);
-                })
-                .catch(err => {
-                    console.error("下載 QR Code 錯誤:", err);
-                    alert("下載失敗，請嘗試右鍵另存 QR Code 圖片。");
-                    downloadBtn.innerHTML = originalText;
-                });
-        });
+                const regex = new RegExp(pattern, flags);
+                const safeText = escapeHtml(text);
 
-        input.value = "https://github.com";
-        updateQrCode();
-    }
-};
-
-return qrGeneratorTool;
-})();
-
-// ==========================================
-// Tool: luckyWheelTool (luckyWheel.js)
-// ==========================================
-const luckyWheelTool = (function() {
-/**
- * ShengTools - 幸運抽籤輪盤
- */
-const luckyWheelTool = {
-    id: "lucky-wheel",
-    name: "幸運抽籤輪盤",
-    icon: "fa-solid fa-arrows-spin",
-    category: "實用與設計",
-    description: "自訂抽籤選項，點擊旋轉輪盤進行隨機抽籤，支援大氣的物理減速動態效果與中獎高亮提示。",
-    render: (container) => {
-        container.innerHTML = `
-            <div class="tool-layout-container">
-                <div class="tool-info-header">
-                    <h2 class="tool-name">幸運抽籤輪盤</h2>
-                    <p class="tool-description">在左側輸入自訂選項（一行一個），點擊下方按鈕即可旋轉輪盤進行公平抽籤。</p>
-                </div>
-                
-                <div class="tool-grid-2col" style="grid-template-columns: 1fr 2fr; align-items: start;">
-                    <!-- 左側：設定與按鈕 -->
-                    <div class="editor-panel">
-                        <div class="editor-label">自訂抽籤選項 (每行一個項目)</div>
-                        <div class="editor-textarea-wrapper" style="height: 260px;">
-                            <textarea id="wheelItems" style="height: 100%;">
-今天吃拉麵 🍜
-今天吃便當 🍱
-今天吃壽司 🍣
-今天吃火鍋 🍲
-今天吃麥當勞 🍔
-今天吃披薩 🍕
-                            </textarea>
-                        </div>
-                        
-                        <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
-                            <button class="tool-btn tool-btn-secondary" id="updateWheelBtn" style="justify-content: center; width: 100%;">
-                                <i class="fa-solid fa-arrows-rotate"></i> 更新輪盤選項
-                            </button>
-                            <button class="tool-btn tool-btn-primary" id="spinWheelBtn" style="justify-content: center; width: 100%; padding: 14px; font-size: 1.05rem;">
-                                <i class="fa-solid fa-play"></i> 開始旋轉輪盤
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- 右側：輪盤與中獎宣告 -->
-                    <div class="wheel-section">
-                        <div class="wheel-wrapper" style="width: 460px; height: 460px;">
-                            <canvas id="wheelCanvas" width="460" height="460"></canvas>
-                            <!-- CSS 頂部紅色指針 -->
-                            <div class="wheel-pointer"></div>
-                        </div>
-                        <div class="winner-announce" id="winnerAnnounce" style="display: none;"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const textarea = container.querySelector("#wheelItems");
-        const updateBtn = container.querySelector("#updateWheelBtn");
-        const spinBtn = container.querySelector("#spinWheelBtn");
-        const canvas = container.querySelector("#wheelCanvas");
-        const winnerAnnounce = container.querySelector("#winnerAnnounce");
-        const ctx = canvas.getContext("2d");
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const cx = width / 2;
-        const cy = height / 2;
-        const radius = width / 2 - 14;
-
-        let items = [];
-        let currentAngle = 0;
-        let speed = 0;
-        let friction = 0.985; // 減速摩擦力，值越大轉越久（輪盤更大，轉久一點更好看）
-        let isSpinning = false;
-        let animId = null;
-
-        // 解析並讀取設定
-        const loadItems = () => {
-            items = textarea.value.split("\n")
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
-        };
-
-        // 柔和配色組（避免太刺眼）
-        const colorPalette = [
-            '#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f97316',
-            '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4',
-            '#3b82f6', '#8b5cf6', '#d946ef', '#e11d48', '#ea580c',
-            '#ca8a04', '#65a30d', '#16a34a', '#0d9488', '#0891b2'
-        ];
-
-        // 繪製輪盤
-        const drawWheel = () => {
-            ctx.clearRect(0, 0, width, height);
-            
-            if (items.length === 0) {
-                ctx.save();
-                ctx.translate(cx, cy);
-                ctx.textAlign = "center";
-                ctx.fillStyle = "#9ca3af";
-                ctx.font = "16px Outfit, Microsoft JhengHei";
-                ctx.fillText("請在左側輸入選項", 0, 0);
-                ctx.restore();
-                return;
-            }
-
-            const arcSize = (2 * Math.PI) / items.length;
-
-            // 繪製外框光暈圓環
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(cx, cy, radius + 6, 0, 2 * Math.PI);
-            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-            ctx.strokeStyle = isDark ? "rgba(99, 102, 241, 0.25)" : "rgba(79, 70, 229, 0.15)";
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            ctx.restore();
-
-            // 旋轉畫布整體
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(currentAngle);
-
-            for (let i = 0; i < items.length; i++) {
-                const startAngle = i * arcSize;
-                const endAngle = startAngle + arcSize;
-
-                // 1. 繪製扇形
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colorPalette[i % colorPalette.length];
-                ctx.fill();
-                
-                // 繪製白線條隔開
-                ctx.strokeStyle = "rgba(255,255,255,0.25)";
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // 2. 繪製文字 (translate & rotate)
-                ctx.save();
-                ctx.rotate(startAngle + arcSize / 2);
-                ctx.textAlign = "right";
-                ctx.fillStyle = "#ffffff";
-                
-                // 根據輪盤大小與項目數量動態調整字型
-                const fontSize = items.length <= 6 ? 16 : items.length <= 10 ? 14 : 12;
-                ctx.font = `bold ${fontSize}px Outfit, Microsoft JhengHei`;
-                
-                // 文字陰影提升可讀性
-                ctx.shadowColor = "rgba(0,0,0,0.4)";
-                ctx.shadowBlur = 3;
-                ctx.shadowOffsetX = 1;
-                ctx.shadowOffsetY = 1;
-                
-                // 截短過長選項字元避免壓疊
-                let text = items[i];
-                const maxLen = items.length <= 6 ? 14 : items.length <= 10 ? 10 : 8;
-                if (text.length > maxLen) text = text.substring(0, maxLen - 2) + "...";
-                
-                ctx.fillText(text, radius - 20, 5);
-                ctx.restore();
-            }
-
-            ctx.restore();
-
-            // 3. 繪製中心漸層裝飾圓盤
-            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
-            gradient.addColorStop(0, isDark ? "#374151" : "#ffffff");
-            gradient.addColorStop(1, isDark ? "#1f2937" : "#f1f5f9");
-            
-            ctx.beginPath();
-            ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
-            ctx.fillStyle = gradient;
-            ctx.fill();
-            ctx.strokeStyle = "rgba(99, 102, 241, 0.5)";
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            // 中心小圓點
-            ctx.beginPath();
-            ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = "#6366f1";
-            ctx.fill();
-        };
-
-        // 實體旋轉物理減速循環
-        const rotateCycle = () => {
-            if (!document.getElementById("wheelCanvas")) {
-                cancelAnimationFrame(animId);
-                return; // 路由安全機制，若輪盤已卸載則終止循環
-            }
-
-            currentAngle += speed;
-            speed *= friction;
-
-            drawWheel();
-
-            if (speed < 0.001) {
-                // 停止旋轉
-                isSpinning = false;
-                cancelAnimationFrame(animId);
-
-                // 啟動按鈕
-                spinBtn.disabled = false;
-                textarea.disabled = false;
-                updateBtn.disabled = false;
-
-                // 計算指針指向的項目 (指針在正上方：1.5 * Math.PI)
-                const arcSize = (2 * Math.PI) / items.length;
-                let targetAngle = (1.5 * Math.PI - currentAngle) % (2 * Math.PI);
-                if (targetAngle < 0) targetAngle += 2 * Math.PI;
-
-                const index = Math.floor(targetAngle / arcSize) % items.length;
-                const winner = items[index];
-
-                // 顯示中獎視覺通知
-                winnerAnnounce.textContent = `🎉 恭喜中籤：${winner}`;
-                winnerAnnounce.style.display = "block";
-            } else {
-                animId = requestAnimationFrame(rotateCycle);
-            }
-        };
-
-        // 更新按鈕
-        updateBtn.addEventListener("click", () => {
-            if (isSpinning) return;
-            loadItems();
-            winnerAnnounce.style.display = "none";
-            drawWheel();
-        });
-
-        // 旋轉按鈕
-        spinBtn.addEventListener("click", () => {
-            if (isSpinning) return;
-            loadItems();
-
-            if (items.length === 0) {
-                alert("請先輸入抽籤選項！");
-                return;
-            }
-
-            isSpinning = true;
-            winnerAnnounce.style.display = "none";
-            
-            // 停用相關輸入與按鈕
-            spinBtn.disabled = true;
-            textarea.disabled = true;
-            updateBtn.disabled = true;
-
-            // 隨機設定初始速度 (介於 0.25 到 0.45 之間)
-            speed = Math.random() * 0.2 + 0.25;
-            rotateCycle();
-        });
-
-        // 初始載入
-        loadItems();
-        drawWheel();
-    }
-};
-
-return luckyWheelTool;
-})();
-
-// ==========================================
-// Tool: dateCalculatorTool (dateCalculator.js)
-// ==========================================
-const dateCalculatorTool = (function() {
-
-
-const dateCalculatorTool = {
-    id: 'date-calculator',
-    name: '日期計算器',
-    icon: 'fa-solid fa-calendar-days',
-    category: '實用與設計',
-    description: '計算兩個日期之間的差距（小時、天數、月數、年數），支援工作天計算，也可從指定日期加減天數推算目標日期。',
-    render(container) {
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-        
-        const thirtyDaysLater = new Date(today);
-        thirtyDaysLater.setDate(today.getDate() + 30);
-        const thirtyDaysLaterStr = thirtyDaysLater.toISOString().split('T')[0];
-
-        container.innerHTML = `
-            <div class="tool-layout-container">
-                <div class="tool-info-header">
-                    <div class="tool-name"><i class="fa-solid fa-calendar-days"></i> 日期計算器</div>
-                    <div class="tool-description">計算兩個日期之間的差距（小時、天數、月數、年數），支援工作天計算，也可從指定日期加減天數推算目標日期。</div>
-                </div>
-
-                <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
-                    <button class="tab-btn active" data-tab="diff" style="background: none; border: none; color: var(--text-primary); padding: 0.75rem 1rem; cursor: pointer; border-bottom: 2px solid var(--accent); font-weight: bold;">日期差距計算</button>
-                    <button class="tab-btn" data-tab="add" style="background: none; border: none; color: var(--text-secondary); padding: 0.75rem 1rem; cursor: pointer; border-bottom: 2px solid transparent; font-weight: bold;">日期加減推算</button>
-                </div>
-
-                <!-- Section 1: 日期差距計算 -->
-                <div id="tab-content-diff" class="tab-content active" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div class="editor-panel">
-                        <div class="tool-grid-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div>
-                                <label class="editor-label">開始日期</label>
-                                <input type="date" id="diff-start" class="tool-input-field" value="${todayStr}">
-                            </div>
-                            <div>
-                                <label class="editor-label">結束日期</label>
-                                <input type="date" id="diff-end" class="tool-input-field" value="${thirtyDaysLaterStr}">
-                            </div>
-                        </div>
-                        <div style="margin-top: 1rem;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer;">
-                                <input type="checkbox" id="diff-business-days"> 計算工作天 (排除週末)
-                            </label>
-                        </div>
-                        <div class="tool-actions-row" style="margin-top: 1.5rem;">
-                            <button id="btn-calc-diff" class="tool-btn tool-btn-primary">計算差距</button>
-                        </div>
-                    </div>
-                    
-                    <div id="diff-results" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <!-- Results injected here -->
-                    </div>
-                </div>
-
-                <!-- Section 2: 日期加減推算 -->
-                <div id="tab-content-add" class="tab-content" style="display: none; flex-direction: column; gap: 1.5rem;">
-                    <div class="editor-panel">
-                        <div class="tool-grid-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div>
-                                <label class="editor-label">基準日期</label>
-                                <input type="date" id="add-base" class="tool-input-field" value="${todayStr}">
-                            </div>
-                            <div>
-                                <label class="editor-label">天數</label>
-                                <input type="number" id="add-days" class="tool-input-field" value="30" min="0">
-                            </div>
-                        </div>
-                        <div style="margin-top: 1rem; display: flex; gap: 1.5rem; align-items: center;">
-                            <div style="display: flex; gap: 1rem;">
-                                <label style="color: var(--text-primary); cursor: pointer;"><input type="radio" name="add-op" value="add" checked> 加</label>
-                                <label style="color: var(--text-primary); cursor: pointer;"><input type="radio" name="add-op" value="sub"> 減</label>
-                            </div>
-                            <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer;">
-                                <input type="checkbox" id="add-business-days"> 僅計算工作天
-                            </label>
-                        </div>
-                        <div class="tool-actions-row" style="margin-top: 1.5rem;">
-                            <button id="btn-calc-add" class="tool-btn tool-btn-primary">推算日期</button>
-                        </div>
-                    </div>
-                    
-                    <div id="add-results" style="display: none;">
-                        <!-- Results injected here -->
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Tab Switching Logic
-        const tabBtns = container.querySelectorAll('.tab-btn');
-        const tabContents = container.querySelectorAll('.tab-content');
-
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabBtns.forEach(b => {
-                    b.classList.remove('active');
-                    b.style.color = 'var(--text-secondary)';
-                    b.style.borderBottomColor = 'transparent';
-                });
-                tabContents.forEach(c => c.style.display = 'none');
-
-                btn.classList.add('active');
-                btn.style.color = 'var(--text-primary)';
-                btn.style.borderBottomColor = 'var(--accent)';
-                container.querySelector(`#tab-content-${btn.dataset.tab}`).style.display = 'flex';
-            });
-        });
-
-        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-
-        // Section 1: Calculate Diff
-        const btnCalcDiff = container.querySelector('#btn-calc-diff');
-        const diffResults = container.querySelector('#diff-results');
-        
-        btnCalcDiff.addEventListener('click', () => {
-            const startDateStr = container.querySelector('#diff-start').value;
-            const endDateStr = container.querySelector('#diff-end').value;
-            const calcBiz = container.querySelector('#diff-business-days').checked;
-
-            if (!startDateStr || !endDateStr) return;
-
-            let start = new Date(startDateStr);
-            let end = new Date(endDateStr);
-            start.setHours(0,0,0,0);
-            end.setHours(0,0,0,0);
-
-            let isNegative = false;
-            if (start > end) {
-                const temp = start;
-                start = end;
-                end = temp;
-                isNegative = true;
-            }
-
-            const diffTime = Math.abs(end - start);
-            const totalDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-            
-            let bizDays = 0;
-            let weekendDays = 0;
-            
-            if (calcBiz) {
-                let current = new Date(start);
-                while (current < end) {
-                    const dayOfWeek = current.getDay();
-                    if (dayOfWeek === 0 || dayOfWeek === 6) weekendDays++;
-                    else bizDays++;
-                    current.setDate(current.getDate() + 1);
+                if (!text) {
+                    resultPanel.innerHTML = "<span style='color:var(--text-muted)'>請在左側輸入測試文字</span>";
+                    return;
                 }
+
+                let matchedHtml = safeText.replace(regex, (match) => `<mark class="regex-match">${match}</mark>`);
+                resultPanel.innerHTML = matchedHtml;
+            } catch (e) {
+                errorBox.textContent = `❌ 正規表達式語法錯誤：${e.message}`;
+                errorBox.style.display = "block";
             }
+        };
 
-            const totalHours = totalDays * 24;
-            const weeks = Math.floor(totalDays / 7);
-            const remainingDaysWeek = totalDays % 7;
-            const approxMonths = (totalDays / 30.44).toFixed(1);
-            const years = Math.floor(totalDays / 365);
-            const remainingDaysYear = totalDays % 365;
-
-            const makeCard = (label, value, icon) => `
-                <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
-                    <div style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
-                        <i class="${icon}"></i> ${label}
-                    </div>
-                    <div style="font-size: 2rem; font-weight: bold; background: var(--accent-gradient, linear-gradient(90deg, #60a5fa, #a78bfa)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                        ${value}
-                    </div>
-                </div>
-            `;
-
-            let html = '';
-            const prefix = isNegative ? '-' : '';
-            html += makeCard('總天數', prefix + totalDays, 'fa-solid fa-sun');
-            if (calcBiz) {
-                html += makeCard('工作天數', prefix + bizDays, 'fa-solid fa-briefcase');
-                html += makeCard('週末天數', prefix + weekendDays, 'fa-solid fa-mug-hot');
-            }
-            html += makeCard('總小時數', prefix + totalHours.toLocaleString(), 'fa-solid fa-clock');
-            html += makeCard('週數', prefix + `${weeks}週${remainingDaysWeek ? ` ${remainingDaysWeek}天` : ''}`, 'fa-solid fa-calendar-week');
-            html += makeCard('總月數 (約)', prefix + approxMonths, 'fa-solid fa-moon');
-            html += makeCard('年數', prefix + `${years}年${remainingDaysYear ? ` ${remainingDaysYear}天` : ''}`, 'fa-solid fa-calendar-check');
-
-            diffResults.innerHTML = html;
-            diffResults.style.display = 'grid';
-        });
-
-        // Section 2: Calculate Add/Sub
-        const btnCalcAdd = container.querySelector('#btn-calc-add');
-        const addResults = container.querySelector('#add-results');
-
-        btnCalcAdd.addEventListener('click', () => {
-            const baseStr = container.querySelector('#add-base').value;
-            let days = parseInt(container.querySelector('#add-days').value, 10);
-            const op = container.querySelector('input[name="add-op"]:checked').value;
-            const bizOnly = container.querySelector('#add-business-days').checked;
-
-            if (!baseStr || isNaN(days)) return;
-
-            const target = new Date(baseStr);
-            target.setHours(0,0,0,0);
-            
-            const direction = op === 'add' ? 1 : -1;
-
-            if (bizOnly) {
-                let remainingDays = days;
-                while (remainingDays > 0) {
-                    target.setDate(target.getDate() + direction);
-                    const day = target.getDay();
-                    if (day !== 0 && day !== 6) {
-                        remainingDays--;
-                    }
-                }
-            } else {
-                target.setDate(target.getDate() + (days * direction));
-            }
-
-            const yyyy = target.getFullYear();
-            const mm = String(target.getMonth() + 1).padStart(2, '0');
-            const dd = String(target.getDate()).padStart(2, '0');
-            const dayOfWeek = weekdays[target.getDay()];
-
-            addResults.innerHTML = `
-                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
-                    <div style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 1.1rem;">推算結果</div>
-                    <div style="font-size: 3rem; font-weight: bold; background: var(--accent-gradient, linear-gradient(90deg, #60a5fa, #a78bfa)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: var(--font-mono, monospace);">
-                        ${yyyy}-${mm}-${dd}
-                    </div>
-                    <div style="font-size: 1.5rem; color: var(--text-primary); margin-top: 1rem;">
-                        ${yyyy}年${target.getMonth() + 1}月${target.getDate()}日 (星期${dayOfWeek})
-                    </div>
-                </div>
-            `;
-            addResults.style.display = 'block';
-        });
-
-        // Trigger initial calcs
-        btnCalcDiff.click();
-        btnCalcAdd.click();
+        patternInput.addEventListener("input", performMatch);
+        testText.addEventListener("input", performMatch);
+        flagG.addEventListener("change", performMatch);
+        flagI.addEventListener("change", performMatch);
+        flagM.addEventListener("change", performMatch);
     }
 };
 
-return dateCalculatorTool;
+return regexTesterTool;
 })();
 
 // ==========================================
@@ -3661,7 +3085,7 @@ const currencyConverterTool = {
     id: 'currency-converter',
     name: '貨幣轉換器',
     icon: 'fa-solid fa-money-bill-transfer',
-    category: '實用與設計',
+    category: '實用與生活',
     description: '即時匯率貨幣轉換器，支援全球 30+ 種主要貨幣即時換算。',
     render(container) {
         const currencies = {
@@ -3979,6 +3403,1104 @@ return currencyConverterTool;
 })();
 
 // ==========================================
+// Tool: dateCalculatorTool (dateCalculator.js)
+// ==========================================
+const dateCalculatorTool = (function() {
+
+
+const dateCalculatorTool = {
+    id: 'date-calculator',
+    name: '日期計算器',
+    icon: 'fa-solid fa-calendar-days',
+    category: '實用與生活',
+    description: '計算兩個日期之間的差距（小時、天數、月數、年數），支援工作天計算，也可從指定日期加減天數推算目標日期。',
+    render(container) {
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        
+        const thirtyDaysLater = new Date(today);
+        thirtyDaysLater.setDate(today.getDate() + 30);
+        const thirtyDaysLaterStr = thirtyDaysLater.toISOString().split('T')[0];
+
+        container.innerHTML = `
+            <div class="tool-layout-container">
+                <div class="tool-info-header">
+                    <div class="tool-name"><i class="fa-solid fa-calendar-days"></i> 日期計算器</div>
+                    <div class="tool-description">計算兩個日期之間的差距（小時、天數、月數、年數），支援工作天計算，也可從指定日期加減天數推算目標日期。</div>
+                </div>
+
+                <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
+                    <button class="tab-btn active" data-tab="diff" style="background: none; border: none; color: var(--text-primary); padding: 0.75rem 1rem; cursor: pointer; border-bottom: 2px solid var(--accent); font-weight: bold;">日期差距計算</button>
+                    <button class="tab-btn" data-tab="add" style="background: none; border: none; color: var(--text-secondary); padding: 0.75rem 1rem; cursor: pointer; border-bottom: 2px solid transparent; font-weight: bold;">日期加減推算</button>
+                </div>
+
+                <!-- Section 1: 日期差距計算 -->
+                <div id="tab-content-diff" class="tab-content active" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div class="editor-panel">
+                        <div class="tool-grid-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label class="editor-label">開始日期</label>
+                                <input type="date" id="diff-start" class="tool-input-field" value="${todayStr}">
+                            </div>
+                            <div>
+                                <label class="editor-label">結束日期</label>
+                                <input type="date" id="diff-end" class="tool-input-field" value="${thirtyDaysLaterStr}">
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer;">
+                                <input type="checkbox" id="diff-business-days"> 計算工作天 (排除週末)
+                            </label>
+                        </div>
+                        <div class="tool-actions-row" style="margin-top: 1.5rem;">
+                            <button id="btn-calc-diff" class="tool-btn tool-btn-primary">計算差距</button>
+                        </div>
+                    </div>
+                    
+                    <div id="diff-results" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <!-- Results injected here -->
+                    </div>
+                </div>
+
+                <!-- Section 2: 日期加減推算 -->
+                <div id="tab-content-add" class="tab-content" style="display: none; flex-direction: column; gap: 1.5rem;">
+                    <div class="editor-panel">
+                        <div class="tool-grid-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label class="editor-label">基準日期</label>
+                                <input type="date" id="add-base" class="tool-input-field" value="${todayStr}">
+                            </div>
+                            <div>
+                                <label class="editor-label">天數</label>
+                                <input type="number" id="add-days" class="tool-input-field" value="30" min="0">
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 1.5rem; align-items: center;">
+                            <div style="display: flex; gap: 1rem;">
+                                <label style="color: var(--text-primary); cursor: pointer;"><input type="radio" name="add-op" value="add" checked> 加</label>
+                                <label style="color: var(--text-primary); cursor: pointer;"><input type="radio" name="add-op" value="sub"> 減</label>
+                            </div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); cursor: pointer;">
+                                <input type="checkbox" id="add-business-days"> 僅計算工作天
+                            </label>
+                        </div>
+                        <div class="tool-actions-row" style="margin-top: 1.5rem;">
+                            <button id="btn-calc-add" class="tool-btn tool-btn-primary">推算日期</button>
+                        </div>
+                    </div>
+                    
+                    <div id="add-results" style="display: none;">
+                        <!-- Results injected here -->
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Tab Switching Logic
+        const tabBtns = container.querySelectorAll('.tab-btn');
+        const tabContents = container.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.color = 'var(--text-secondary)';
+                    b.style.borderBottomColor = 'transparent';
+                });
+                tabContents.forEach(c => c.style.display = 'none');
+
+                btn.classList.add('active');
+                btn.style.color = 'var(--text-primary)';
+                btn.style.borderBottomColor = 'var(--accent)';
+                container.querySelector(`#tab-content-${btn.dataset.tab}`).style.display = 'flex';
+            });
+        });
+
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+
+        // Section 1: Calculate Diff
+        const btnCalcDiff = container.querySelector('#btn-calc-diff');
+        const diffResults = container.querySelector('#diff-results');
+        
+        btnCalcDiff.addEventListener('click', () => {
+            const startDateStr = container.querySelector('#diff-start').value;
+            const endDateStr = container.querySelector('#diff-end').value;
+            const calcBiz = container.querySelector('#diff-business-days').checked;
+
+            if (!startDateStr || !endDateStr) return;
+
+            let start = new Date(startDateStr);
+            let end = new Date(endDateStr);
+            start.setHours(0,0,0,0);
+            end.setHours(0,0,0,0);
+
+            let isNegative = false;
+            if (start > end) {
+                const temp = start;
+                start = end;
+                end = temp;
+                isNegative = true;
+            }
+
+            const diffTime = Math.abs(end - start);
+            const totalDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+            
+            let bizDays = 0;
+            let weekendDays = 0;
+            
+            if (calcBiz) {
+                let current = new Date(start);
+                while (current < end) {
+                    const dayOfWeek = current.getDay();
+                    if (dayOfWeek === 0 || dayOfWeek === 6) weekendDays++;
+                    else bizDays++;
+                    current.setDate(current.getDate() + 1);
+                }
+            }
+
+            const totalHours = totalDays * 24;
+            const weeks = Math.floor(totalDays / 7);
+            const remainingDaysWeek = totalDays % 7;
+            const approxMonths = (totalDays / 30.44).toFixed(1);
+            const years = Math.floor(totalDays / 365);
+            const remainingDaysYear = totalDays % 365;
+
+            const makeCard = (label, value, icon) => `
+                <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
+                    <div style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        <i class="${icon}"></i> ${label}
+                    </div>
+                    <div style="font-size: 2rem; font-weight: bold; background: var(--accent-gradient, linear-gradient(90deg, #60a5fa, #a78bfa)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        ${value}
+                    </div>
+                </div>
+            `;
+
+            let html = '';
+            const prefix = isNegative ? '-' : '';
+            html += makeCard('總天數', prefix + totalDays, 'fa-solid fa-sun');
+            if (calcBiz) {
+                html += makeCard('工作天數', prefix + bizDays, 'fa-solid fa-briefcase');
+                html += makeCard('週末天數', prefix + weekendDays, 'fa-solid fa-mug-hot');
+            }
+            html += makeCard('總小時數', prefix + totalHours.toLocaleString(), 'fa-solid fa-clock');
+            html += makeCard('週數', prefix + `${weeks}週${remainingDaysWeek ? ` ${remainingDaysWeek}天` : ''}`, 'fa-solid fa-calendar-week');
+            html += makeCard('總月數 (約)', prefix + approxMonths, 'fa-solid fa-moon');
+            html += makeCard('年數', prefix + `${years}年${remainingDaysYear ? ` ${remainingDaysYear}天` : ''}`, 'fa-solid fa-calendar-check');
+
+            diffResults.innerHTML = html;
+            diffResults.style.display = 'grid';
+        });
+
+        // Section 2: Calculate Add/Sub
+        const btnCalcAdd = container.querySelector('#btn-calc-add');
+        const addResults = container.querySelector('#add-results');
+
+        btnCalcAdd.addEventListener('click', () => {
+            const baseStr = container.querySelector('#add-base').value;
+            let days = parseInt(container.querySelector('#add-days').value, 10);
+            const op = container.querySelector('input[name="add-op"]:checked').value;
+            const bizOnly = container.querySelector('#add-business-days').checked;
+
+            if (!baseStr || isNaN(days)) return;
+
+            const target = new Date(baseStr);
+            target.setHours(0,0,0,0);
+            
+            const direction = op === 'add' ? 1 : -1;
+
+            if (bizOnly) {
+                let remainingDays = days;
+                while (remainingDays > 0) {
+                    target.setDate(target.getDate() + direction);
+                    const day = target.getDay();
+                    if (day !== 0 && day !== 6) {
+                        remainingDays--;
+                    }
+                }
+            } else {
+                target.setDate(target.getDate() + (days * direction));
+            }
+
+            const yyyy = target.getFullYear();
+            const mm = String(target.getMonth() + 1).padStart(2, '0');
+            const dd = String(target.getDate()).padStart(2, '0');
+            const dayOfWeek = weekdays[target.getDay()];
+
+            addResults.innerHTML = `
+                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
+                    <div style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 1.1rem;">推算結果</div>
+                    <div style="font-size: 3rem; font-weight: bold; background: var(--accent-gradient, linear-gradient(90deg, #60a5fa, #a78bfa)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: var(--font-mono, monospace);">
+                        ${yyyy}-${mm}-${dd}
+                    </div>
+                    <div style="font-size: 1.5rem; color: var(--text-primary); margin-top: 1rem;">
+                        ${yyyy}年${target.getMonth() + 1}月${target.getDate()}日 (星期${dayOfWeek})
+                    </div>
+                </div>
+            `;
+            addResults.style.display = 'block';
+        });
+
+        // Trigger initial calcs
+        btnCalcDiff.click();
+        btnCalcAdd.click();
+    }
+};
+
+return dateCalculatorTool;
+})();
+
+// ==========================================
+// Tool: converterBoxTool (converterBox.js)
+// ==========================================
+const converterBoxTool = (function() {
+/**
+ * ShengTools - 進制與單位轉換器
+ */
+const converterBoxTool = {
+    id: "converter-box",
+    name: "進制與單位轉換器",
+    icon: "fa-solid fa-calculator",
+    category: "實用與生活",
+    description: "整合多重進制聯動換算（二/八/十/十六進制）與長度、重量、溫度、面積常用單位雙向計算。",
+    render: (container) => {
+        container.innerHTML = `
+            <div class="tool-layout-container">
+                <div class="tool-info-header">
+                    <h2 class="tool-name">進制與單位轉換器</h2>
+                    <p class="tool-description">採用子標籤設計，快速切換進制或各類度量單位進行動態雙向聯動轉換。</p>
+                </div>
+                
+                <!-- 子標籤切換 -->
+                <div class="tool-sub-tabs">
+                    <button class="sub-tab active" id="tabBaseBtn" data-tab="base">進制聯動轉換</button>
+                    <button class="sub-tab" id="tabUnitBtn" data-tab="unit">度量單位轉換</button>
+                </div>
+                
+                <!-- 進制內容區 -->
+                <div class="converter-card" id="baseConverterPanel">
+                    <h3 class="palette-section-title"><i class="fa-solid fa-circle-nodes"></i> 多進制雙向同步 (輸入即時換算)</h3>
+                    <div class="base-converter-grid" style="margin-top: 10px;">
+                        <div class="editor-panel">
+                            <label class="editor-label">十進制 (Decimal)</label>
+                            <input type="text" id="baseDec" class="tool-input-field" placeholder="請輸入十進制數值，例如：255" autocomplete="off">
+                        </div>
+                        <div class="editor-panel">
+                            <label class="editor-label">二進制 (Binary)</label>
+                            <input type="text" id="baseBin" class="tool-input-field" placeholder="請輸入二進制，例如：11111111" autocomplete="off">
+                        </div>
+                        <div class="editor-panel">
+                            <label class="editor-label">八進制 (Octal)</label>
+                            <input type="text" id="baseOct" class="tool-input-field" placeholder="請輸入八進制，例如：377" autocomplete="off">
+                        </div>
+                        <div class="editor-panel">
+                            <label class="editor-label">十六進制 (Hexadecimal)</label>
+                            <input type="text" id="baseHex" class="tool-input-field" placeholder="請輸入十六進制，例如：FF" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 單位內容區 (預設隱藏) -->
+                <div class="converter-card" id="unitConverterPanel" style="display: none;">
+                    <h3 class="palette-section-title"><i class="fa-solid fa-ruler-combined"></i> 物理單位轉換</h3>
+                    <div style="display:flex; flex-direction:column; gap:20px; margin-top:10px;">
+                        <div class="editor-panel" style="max-width: 300px;">
+                            <label class="editor-label">選擇轉換類別</label>
+                            <select id="unitCategorySelect" class="tool-select-field">
+                                <option value="length" selected>長度單位 (Length)</option>
+                                <option value="weight">重量單位 (Weight)</option>
+                                <option value="temp">溫度單位 (Temperature)</option>
+                                <option value="area">面積單位 (Area)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="unit-converter-grid">
+                            <!-- 左側輸入 -->
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <input type="number" id="unitInputLeft" class="tool-input-field" value="1">
+                                <select id="unitSelectLeft" class="tool-select-field"></select>
+                            </div>
+                            
+                            <!-- 交換按鈕 -->
+                            <div class="unit-swap-icon" id="unitSwapBtn">
+                                <i class="fa-solid fa-right-left"></i>
+                            </div>
+                            
+                            <!-- 右側輸出 -->
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <input type="number" id="unitInputRight" class="tool-input-field" value="1000">
+                                <select id="unitSelectRight" class="tool-select-field"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 1. 子頁籤切換邏輯
+        const tabBaseBtn = container.querySelector("#tabBaseBtn");
+        const tabUnitBtn = container.querySelector("#tabUnitBtn");
+        const basePanel = container.querySelector("#baseConverterPanel");
+        const unitPanel = container.querySelector("#unitConverterPanel");
+
+        tabBaseBtn.addEventListener("click", () => {
+            tabBaseBtn.classList.add("active");
+            tabUnitBtn.classList.remove("active");
+            basePanel.style.display = "block";
+            unitPanel.style.display = "none";
+        });
+
+        tabUnitBtn.addEventListener("click", () => {
+            tabUnitBtn.classList.add("active");
+            tabBaseBtn.classList.remove("active");
+            unitPanel.style.display = "block";
+            basePanel.style.display = "none";
+        });
+
+        // 2. 進制聯動轉換邏輯
+        const decInput = container.querySelector("#baseDec");
+        const binInput = container.querySelector("#baseBin");
+        const octInput = container.querySelector("#baseOct");
+        const hexInput = container.querySelector("#baseHex");
+
+        const updateAllBases = (decimalValue, sourceInput) => {
+            if (isNaN(decimalValue) || decimalValue === null) {
+                if (sourceInput !== decInput) decInput.value = "";
+                if (sourceInput !== binInput) binInput.value = "";
+                if (sourceInput !== octInput) octInput.value = "";
+                if (sourceInput !== hexInput) hexInput.value = "";
+                return;
+            }
+            if (sourceInput !== decInput) decInput.value = decimalValue.toString(10);
+            if (sourceInput !== binInput) binInput.value = decimalValue.toString(2);
+            if (sourceInput !== octInput) octInput.value = decimalValue.toString(8);
+            if (sourceInput !== hexInput) hexInput.value = decimalValue.toString(16).toUpperCase();
+        };
+
+        decInput.addEventListener("input", () => {
+            const cleaned = decInput.value.replace(/[^0-9\-]/g, "");
+            decInput.value = cleaned;
+            const val = parseInt(cleaned, 10);
+            updateAllBases(isNaN(val) ? null : val, decInput);
+        });
+
+        binInput.addEventListener("input", () => {
+            const cleaned = binInput.value.replace(/[^01]/g, "");
+            binInput.value = cleaned;
+            const val = parseInt(cleaned, 2);
+            updateAllBases(isNaN(val) ? null : val, binInput);
+        });
+
+        octInput.addEventListener("input", () => {
+            const cleaned = octInput.value.replace(/[^0-7]/g, "");
+            octInput.value = cleaned;
+            const val = parseInt(cleaned, 8);
+            updateAllBases(isNaN(val) ? null : val, octInput);
+        });
+
+        hexInput.addEventListener("input", () => {
+            const cleaned = hexInput.value.replace(/[^0-9A-Fa-f]/g, "");
+            hexInput.value = cleaned.toUpperCase();
+            const val = parseInt(cleaned, 16);
+            updateAllBases(isNaN(val) ? null : val, hexInput);
+        });
+
+        // 3. 單位轉換配置與邏輯
+        const unitConfig = {
+            length: {
+                label: "長度",
+                units: {
+                    m: { label: "公尺 (m)", val: 1 },
+                    cm: { label: "公分 (cm)", val: 0.01 },
+                    mm: { label: "公厘 (mm)", val: 0.001 },
+                    km: { label: "公里 (km)", val: 1000 },
+                    in: { label: "英吋 (in)", val: 0.0254 },
+                    ft: { label: "英呎 (ft)", val: 0.3048 },
+                    yd: { label: "碼 (yd)", val: 0.9144 }
+                }
+            },
+            weight: {
+                label: "重量",
+                units: {
+                    kg: { label: "公斤 (kg)", val: 1 },
+                    g: { label: "公克 (g)", val: 0.001 },
+                    lb: { label: "磅 (lb)", val: 0.45359237 },
+                    oz: { label: "盎司 (oz)", val: 0.028349523 },
+                    tw: { label: "台斤", val: 0.6 }
+                }
+            },
+            temp: {
+                label: "溫度",
+                units: {
+                    c: { label: "攝氏 (°C)" },
+                    f: { label: "華氏 (°F)" },
+                    k: { label: "克氏 (K)" }
+                }
+            },
+            area: {
+                label: "面積",
+                units: {
+                    m2: { label: "平方公尺 (㎡)", val: 1 },
+                    cm2: { label: "平方公分 (㎠)", val: 0.0001 },
+                    km2: { label: "平方公里 (㎢)", val: 1000000 },
+                    hectare: { label: "公頃", val: 10000 },
+                    ping: { label: "坪", val: 3.305785 },
+                    acre: { label: "英畝", val: 4046.8564 }
+                }
+            }
+        };
+
+        const catSelect = container.querySelector("#unitCategorySelect");
+        const leftInput = container.querySelector("#unitInputLeft");
+        const rightInput = container.querySelector("#unitInputRight");
+        const leftSelect = container.querySelector("#unitSelectLeft");
+        const rightSelect = container.querySelector("#unitSelectRight");
+        const swapBtn = container.querySelector("#unitSwapBtn");
+
+        const populateUnits = () => {
+            const cat = catSelect.value;
+            const units = unitConfig[cat].units;
+            
+            let selectHtml = "";
+            for (const [key, details] of Object.entries(units)) {
+                selectHtml += `<option value="${key}">${details.label}</option>`;
+            }
+            
+            leftSelect.innerHTML = selectHtml;
+            rightSelect.innerHTML = selectHtml;
+
+            // 預設將左右設為不同單位
+            const keys = Object.keys(units);
+            if (keys.length > 1) {
+                leftSelect.selectedIndex = 0;
+                rightSelect.selectedIndex = 1;
+            }
+        };
+
+        const performConvert = (direction) => {
+            const cat = catSelect.value;
+            const fromUnit = direction === "left-to-right" ? leftSelect.value : rightSelect.value;
+            const toUnit = direction === "left-to-right" ? rightSelect.value : leftSelect.value;
+            const inputField = direction === "left-to-right" ? leftInput : rightInput;
+            const outputField = direction === "left-to-right" ? rightInput : leftInput;
+
+            const val = parseFloat(inputField.value);
+            if (isNaN(val)) {
+                outputField.value = "";
+                return;
+            }
+
+            // 溫度特殊公式轉換
+            if (cat === "temp") {
+                let tempInCelsius = val;
+                if (fromUnit === "f") tempInCelsius = (val - 32) * 5 / 9;
+                if (fromUnit === "k") tempInCelsius = val - 273.15;
+
+                let finalTemp = tempInCelsius;
+                if (toUnit === "f") finalTemp = tempInCelsius * 9 / 5 + 32;
+                if (toUnit === "k") finalTemp = tempInCelsius + 273.15;
+
+                outputField.value = parseFloat(finalTemp.toFixed(4));
+            } else {
+                // 比率係數轉換
+                const baseCoeff = unitConfig[cat].units[fromUnit].val;
+                const targetCoeff = unitConfig[cat].units[toUnit].val;
+                const converted = (val * baseCoeff) / targetCoeff;
+                outputField.value = parseFloat(converted.toFixed(6));
+            }
+        };
+
+        // 監聽單位類別改變
+        catSelect.addEventListener("change", () => {
+            populateUnits();
+            performConvert("left-to-right");
+        });
+
+        // 監聽數值輸入與選單改變
+        leftInput.addEventListener("input", () => performConvert("left-to-right"));
+        rightInput.addEventListener("input", () => performConvert("right-to-left"));
+        leftSelect.addEventListener("change", () => performConvert("left-to-right"));
+        rightSelect.addEventListener("change", () => performConvert("left-to-right"));
+
+        // 交換單位與數值
+        swapBtn.addEventListener("click", () => {
+            const tempSelect = leftSelect.value;
+            leftSelect.value = rightSelect.value;
+            rightSelect.value = tempSelect;
+
+            const tempInput = leftInput.value;
+            leftInput.value = rightInput.value;
+            rightInput.value = tempInput;
+
+            performConvert("left-to-right");
+        });
+
+        // 初始載入單位選項
+        populateUnits();
+        performConvert("left-to-right");
+    }
+};
+
+return converterBoxTool;
+})();
+
+// ==========================================
+// Tool: colorToolsTool (colorTools.js)
+// ==========================================
+const colorToolsTool = (function() {
+/**
+ * ShengTools - 色彩工具與調色盤
+ */
+
+
+const colorToolsTool = {
+    id: "color-tools",
+    name: "色彩工具與調色盤",
+    icon: "fa-solid fa-palette",
+    category: "實用與生活",
+    description: "色彩選擇器、HEX/RGB/HSL 色碼互轉，並自動計算相鄰色與補色調色盤。",
+    render: (container) => {
+        container.innerHTML = `
+            <div class="tool-layout-container">
+                <div class="tool-info-header">
+                    <h2 class="tool-name">色彩工具與調色盤</h2>
+                    <p class="tool-description">色彩選擇器、HEX/RGB/HSL 色碼互轉，支援隨機生成色碼與原生螢幕滴管取色。</p>
+                </div>
+                
+                <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-top:10px;">
+                    <div class="color-picker-section">
+                        <div class="native-color-picker-wrapper">
+                            <input type="color" id="colorPicker" value="#6366f1">
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
+                            <div class="editor-panel">
+                                <label class="editor-label">HEX</label>
+                                <input type="text" id="colorHex" class="tool-input-field" value="#6366F1">
+                            </div>
+                            <div class="editor-panel">
+                                <label class="editor-label">RGB</label>
+                                <input type="text" id="colorRgb" class="tool-input-field" value="rgb(99, 102, 241)">
+                            </div>
+                            <div class="editor-panel">
+                                <label class="editor-label">HSL</label>
+                                <input type="text" id="colorHsl" class="tool-input-field" value="hsl(239, 84%, 67%)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-actions-row" style="margin-top: 20px; justify-content: flex-start;">
+                        <button class="tool-btn tool-btn-secondary" id="randomColorBtn">
+                            <i class="fa-solid fa-dice"></i> 隨機生成顏色
+                        </button>
+                        <button class="tool-btn tool-btn-primary" id="eyeDropperBtn" style="display: none;">
+                            <i class="fa-solid fa-eye-dropper"></i> 螢幕取色器
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="color-palette-card">
+                    <h3 class="palette-section-title">
+                        <i class="fa-solid fa-swatchbook"></i> 推薦配色調色盤
+                    </h3>
+                    <div class="color-swatch-grid" id="colorPaletteGrid"></div>
+                </div>
+            </div>
+        `;
+
+        const picker = container.querySelector("#colorPicker");
+        const hexInput = container.querySelector("#colorHex");
+        const rgbInput = container.querySelector("#colorRgb");
+        const hslInput = container.querySelector("#colorHsl");
+        const paletteGrid = container.querySelector("#colorPaletteGrid");
+        const randomBtn = container.querySelector("#randomColorBtn");
+        const eyedropperBtn = container.querySelector("#eyeDropperBtn");
+
+        const updateColors = (hexVal) => {
+            picker.value = hexVal;
+            hexInput.value = hexVal;
+            const rgb = hexToRgb(hexVal);
+            if (rgb) {
+                rgbInput.value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                hslInput.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+                generatePalette(hsl.h, hsl.s, hsl.l);
+            }
+        };
+
+        const generatePalette = (h, s, l) => {
+            const colors = [
+                { h: h, s: s, l: l },
+                { h: (h + 30) % 360, s: s, l: l },
+                { h: (h + 180) % 360, s: s, l: l },
+                { h: (h + 210) % 360, s: s, l: l },
+                { h: h, s: Math.max(10, s - 15), l: Math.min(90, l + 15) }
+            ];
+
+            paletteGrid.innerHTML = colors.map(hslObj => {
+                const rgbObj = hslToRgb(hslObj.h, hslObj.s, hslObj.l);
+                const hexStr = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+                return `
+                    <div class="color-swatch" data-hex="${hexStr}">
+                        <div class="color-swatch-block" style="background-color: ${hexStr}"></div>
+                        <span class="color-swatch-hex">${hexStr}</span>
+                    </div>
+                `;
+            }).join("");
+
+            paletteGrid.querySelectorAll(".color-swatch").forEach(swatch => {
+                swatch.addEventListener("click", () => {
+                    const hexToCopy = swatch.getAttribute("data-hex");
+                    navigator.clipboard.writeText(hexToCopy).then(() => {
+                        const label = swatch.querySelector(".color-swatch-hex");
+                        const original = label.textContent;
+                        label.textContent = "已複製！";
+                        label.style.color = "var(--success)";
+                        setTimeout(() => {
+                            label.textContent = original;
+                            label.style.color = "";
+                        }, 1000);
+                    });
+                });
+            });
+        };
+
+        picker.addEventListener("input", (e) => updateColors(e.target.value.toUpperCase()));
+        hexInput.addEventListener("input", (e) => {
+            const hex = e.target.value.trim();
+            if (/^#[0-9A-F]{6}$/i.test(hex)) updateColors(hex.toUpperCase());
+        });
+        rgbInput.addEventListener("input", (e) => {
+            const rgbMatch = e.target.value.match(/\d+/g);
+            if (rgbMatch && rgbMatch.length >= 3) {
+                const hex = rgbToHex(parseInt(rgbMatch[0]), parseInt(rgbMatch[1]), parseInt(rgbMatch[2]));
+                updateColors(hex);
+            }
+        });
+
+        // 1. 隨機顏色生成
+        randomBtn.addEventListener("click", () => {
+            const randomHex = rgbToHex(
+                Math.floor(Math.random() * 256),
+                Math.floor(Math.random() * 256),
+                Math.floor(Math.random() * 256)
+            );
+            updateColors(randomHex);
+        });
+
+        // 2. 螢幕取色器 (Eye Dropper API)
+        if ("EyeDropper" in window) {
+            eyedropperBtn.style.display = "flex";
+            eyedropperBtn.addEventListener("click", () => {
+                const eyeDropper = new EyeDropper();
+                eyeDropper.open()
+                    .then(result => {
+                        updateColors(result.sRGBHex.toUpperCase());
+                    })
+                    .catch(err => {
+                        console.log("EyeDropper 取得顏色取消或失敗:", err);
+                    });
+            });
+        }
+
+        updateColors("#6366F1");
+    }
+};
+
+return colorToolsTool;
+})();
+
+// ==========================================
+// Tool: luckyWheelTool (luckyWheel.js)
+// ==========================================
+const luckyWheelTool = (function() {
+/**
+ * ShengTools - 幸運抽籤輪盤
+ */
+const luckyWheelTool = {
+    id: "lucky-wheel",
+    name: "幸運抽籤輪盤",
+    icon: "fa-solid fa-arrows-spin",
+    category: "實用與生活",
+    description: "自訂抽籤選項，點擊旋轉輪盤進行隨機抽籤，支援大氣的物理減速動態效果與中獎高亮提示。",
+    render: (container) => {
+        container.innerHTML = `
+            <div class="tool-layout-container">
+                <div class="tool-info-header">
+                    <h2 class="tool-name">幸運抽籤輪盤</h2>
+                    <p class="tool-description">在左側輸入自訂選項（一行一個），點擊下方按鈕即可旋轉輪盤進行公平抽籤。</p>
+                </div>
+                
+                <div class="tool-grid-2col" style="grid-template-columns: 1fr 2fr; align-items: start;">
+                    <!-- 左側：設定與按鈕 -->
+                    <div class="editor-panel">
+                        <div class="editor-label">自訂抽籤選項 (每行一個項目)</div>
+                        <div class="editor-textarea-wrapper" style="height: 260px;">
+                            <textarea id="wheelItems" style="height: 100%;">
+今天吃拉麵 🍜
+今天吃便當 🍱
+今天吃壽司 🍣
+今天吃火鍋 🍲
+今天吃麥當勞 🍔
+今天吃披薩 🍕
+                            </textarea>
+                        </div>
+                        
+                        <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                            <button class="tool-btn tool-btn-secondary" id="updateWheelBtn" style="justify-content: center; width: 100%;">
+                                <i class="fa-solid fa-arrows-rotate"></i> 更新輪盤選項
+                            </button>
+                            <button class="tool-btn tool-btn-primary" id="spinWheelBtn" style="justify-content: center; width: 100%; padding: 14px; font-size: 1.05rem;">
+                                <i class="fa-solid fa-play"></i> 開始旋轉輪盤
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 右側：輪盤與中獎宣告 -->
+                    <div class="wheel-section">
+                        <div class="wheel-wrapper" style="width: 460px; height: 460px;">
+                            <canvas id="wheelCanvas" width="460" height="460"></canvas>
+                            <!-- CSS 頂部紅色指針 -->
+                            <div class="wheel-pointer"></div>
+                        </div>
+                        <div class="winner-announce" id="winnerAnnounce" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const textarea = container.querySelector("#wheelItems");
+        const updateBtn = container.querySelector("#updateWheelBtn");
+        const spinBtn = container.querySelector("#spinWheelBtn");
+        const canvas = container.querySelector("#wheelCanvas");
+        const winnerAnnounce = container.querySelector("#winnerAnnounce");
+        const ctx = canvas.getContext("2d");
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const cx = width / 2;
+        const cy = height / 2;
+        const radius = width / 2 - 14;
+
+        let items = [];
+        let currentAngle = 0;
+        let speed = 0;
+        let friction = 0.985; // 減速摩擦力，值越大轉越久（輪盤更大，轉久一點更好看）
+        let isSpinning = false;
+        let animId = null;
+
+        // 解析並讀取設定
+        const loadItems = () => {
+            items = textarea.value.split("\n")
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+        };
+
+        // 柔和配色組（避免太刺眼）
+        const colorPalette = [
+            '#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f97316',
+            '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4',
+            '#3b82f6', '#8b5cf6', '#d946ef', '#e11d48', '#ea580c',
+            '#ca8a04', '#65a30d', '#16a34a', '#0d9488', '#0891b2'
+        ];
+
+        // 繪製輪盤
+        const drawWheel = () => {
+            ctx.clearRect(0, 0, width, height);
+            
+            if (items.length === 0) {
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#9ca3af";
+                ctx.font = "16px Outfit, Microsoft JhengHei";
+                ctx.fillText("請在左側輸入選項", 0, 0);
+                ctx.restore();
+                return;
+            }
+
+            const arcSize = (2 * Math.PI) / items.length;
+
+            // 繪製外框光暈圓環
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius + 6, 0, 2 * Math.PI);
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            ctx.strokeStyle = isDark ? "rgba(99, 102, 241, 0.25)" : "rgba(79, 70, 229, 0.15)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.restore();
+
+            // 旋轉畫布整體
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(currentAngle);
+
+            for (let i = 0; i < items.length; i++) {
+                const startAngle = i * arcSize;
+                const endAngle = startAngle + arcSize;
+
+                // 1. 繪製扇形
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colorPalette[i % colorPalette.length];
+                ctx.fill();
+                
+                // 繪製白線條隔開
+                ctx.strokeStyle = "rgba(255,255,255,0.25)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // 2. 繪製文字 (translate & rotate)
+                ctx.save();
+                ctx.rotate(startAngle + arcSize / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#ffffff";
+                
+                // 根據輪盤大小與項目數量動態調整字型
+                const fontSize = items.length <= 6 ? 16 : items.length <= 10 ? 14 : 12;
+                ctx.font = `bold ${fontSize}px Outfit, Microsoft JhengHei`;
+                
+                // 文字陰影提升可讀性
+                ctx.shadowColor = "rgba(0,0,0,0.4)";
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                
+                // 截短過長選項字元避免壓疊
+                let text = items[i];
+                const maxLen = items.length <= 6 ? 14 : items.length <= 10 ? 10 : 8;
+                if (text.length > maxLen) text = text.substring(0, maxLen - 2) + "...";
+                
+                ctx.fillText(text, radius - 20, 5);
+                ctx.restore();
+            }
+
+            ctx.restore();
+
+            // 3. 繪製中心漸層裝飾圓盤
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
+            gradient.addColorStop(0, isDark ? "#374151" : "#ffffff");
+            gradient.addColorStop(1, isDark ? "#1f2937" : "#f1f5f9");
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.strokeStyle = "rgba(99, 102, 241, 0.5)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 中心小圓點
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = "#6366f1";
+            ctx.fill();
+        };
+
+        // 實體旋轉物理減速循環
+        const rotateCycle = () => {
+            if (!document.getElementById("wheelCanvas")) {
+                cancelAnimationFrame(animId);
+                return; // 路由安全機制，若輪盤已卸載則終止循環
+            }
+
+            currentAngle += speed;
+            speed *= friction;
+
+            drawWheel();
+
+            if (speed < 0.001) {
+                // 停止旋轉
+                isSpinning = false;
+                cancelAnimationFrame(animId);
+
+                // 啟動按鈕
+                spinBtn.disabled = false;
+                textarea.disabled = false;
+                updateBtn.disabled = false;
+
+                // 計算指針指向的項目 (指針在正上方：1.5 * Math.PI)
+                const arcSize = (2 * Math.PI) / items.length;
+                let targetAngle = (1.5 * Math.PI - currentAngle) % (2 * Math.PI);
+                if (targetAngle < 0) targetAngle += 2 * Math.PI;
+
+                const index = Math.floor(targetAngle / arcSize) % items.length;
+                const winner = items[index];
+
+                // 顯示中獎視覺通知
+                winnerAnnounce.textContent = `🎉 恭喜中籤：${winner}`;
+                winnerAnnounce.style.display = "block";
+            } else {
+                animId = requestAnimationFrame(rotateCycle);
+            }
+        };
+
+        // 更新按鈕
+        updateBtn.addEventListener("click", () => {
+            if (isSpinning) return;
+            loadItems();
+            winnerAnnounce.style.display = "none";
+            drawWheel();
+        });
+
+        // 旋轉按鈕
+        spinBtn.addEventListener("click", () => {
+            if (isSpinning) return;
+            loadItems();
+
+            if (items.length === 0) {
+                alert("請先輸入抽籤選項！");
+                return;
+            }
+
+            isSpinning = true;
+            winnerAnnounce.style.display = "none";
+            
+            // 停用相關輸入與按鈕
+            spinBtn.disabled = true;
+            textarea.disabled = true;
+            updateBtn.disabled = true;
+
+            // 隨機設定初始速度 (介於 0.25 到 0.45 之間)
+            speed = Math.random() * 0.2 + 0.25;
+            rotateCycle();
+        });
+
+        // 初始載入
+        loadItems();
+        drawWheel();
+    }
+};
+
+return luckyWheelTool;
+})();
+
+// ==========================================
+// Tool: qrGeneratorTool (qrGenerator.js)
+// ==========================================
+const qrGeneratorTool = (function() {
+/**
+ * ShengTools - QR Code 生成器
+ */
+const qrGeneratorTool = {
+    id: "qr-generator",
+    name: "QR Code 生成器",
+    icon: "fa-solid fa-qrcode",
+    category: "實用與生活",
+    description: "輸入任意文字或網址 URL 即時生成 QR Code 二維碼，支援自訂多種尺寸並可一鍵下載。",
+    render: (container) => {
+        container.innerHTML = `
+            <div class="tool-layout-container">
+                <div class="tool-info-header">
+                    <h2 class="tool-name">QR Code 生成器</h2>
+                    <p class="tool-description">輸入網址或文字，系統會即時為您生成二維碼。此二維碼是在瀏覽器本地調用 API 生成，安全、快捷。</p>
+                </div>
+                
+                <div class="tool-grid-2col">
+                    <div class="editor-panel">
+                        <div class="editor-label">輸入 QR Code 內容 (網址或純文字)</div>
+                        <div class="editor-textarea-wrapper" style="height:120px;">
+                            <textarea id="qrInputText" style="height:100%" placeholder="在此輸入文字，例如：https://google.com"></textarea>
+                        </div>
+                        
+                        <div class="editor-label" style="margin-top:16px;">圖片尺寸選擇 (像素)</div>
+                        <select id="qrSizeSelect" class="tool-select-field">
+                            <option value="150">150 x 150 px</option>
+                            <option value="200" selected>200 x 200 px</option>
+                            <option value="250">250 x 250 px</option>
+                            <option value="300">300 x 300 px</option>
+                            <option value="400">400 x 400 px</option>
+                        </select>
+                        
+                        <div style="margin-top:24px;">
+                            <button class="tool-btn tool-btn-primary" id="downloadQrBtn" style="width:100%; justify-content:center;">
+                                <i class="fa-solid fa-download"></i> 下載 QR Code 圖片
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="editor-panel">
+                        <div class="editor-label">即時 QR Code 預覽</div>
+                        <div class="qr-preview-card">
+                            <div class="qr-image-wrapper" id="qrImageWrapper">
+                                <img id="qrImage" src="" alt="QR Code 預覽區">
+                            </div>
+                            <span class="color-swatch-hex" style="color:var(--text-muted)">使用手機相機即可直接掃描讀取</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const input = container.querySelector("#qrInputText");
+        const sizeSelect = container.querySelector("#qrSizeSelect");
+        const qrImg = container.querySelector("#qrImage");
+        const downloadBtn = container.querySelector("#downloadQrBtn");
+
+        const updateQrCode = () => {
+            const text = input.value.trim();
+            const size = sizeSelect.value;
+            
+            if (!text) {
+                const defaultUrl = "https://github.com";
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(defaultUrl)}`;
+                return;
+            }
+            
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
+        };
+
+        input.addEventListener("input", updateQrCode);
+        sizeSelect.addEventListener("change", updateQrCode);
+
+        downloadBtn.addEventListener("click", () => {
+            const text = input.value.trim();
+            if (!text) {
+                alert("請先在左側輸入要生成的內容再進行下載！");
+                return;
+            }
+
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 下載中...`;
+
+            fetch(qrImg.src)
+                .then(res => res.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `shengtools_qrcode_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    downloadBtn.innerHTML = `<i class="fa-solid fa-check"></i> 下載成功！`;
+                    downloadBtn.style.background = "var(--success)";
+                    
+                    setTimeout(() => {
+                        downloadBtn.innerHTML = originalText;
+                        downloadBtn.style.background = "";
+                    }, 1500);
+                })
+                .catch(err => {
+                    console.error("下載 QR Code 錯誤:", err);
+                    alert("下載失敗，請嘗試右鍵另存 QR Code 圖片。");
+                    downloadBtn.innerHTML = originalText;
+                });
+        });
+
+        input.value = "https://github.com";
+        updateQrCode();
+    }
+};
+
+return qrGeneratorTool;
+})();
+
+// ==========================================
 // Tool: httpStatusTool (httpStatus.js)
 // ==========================================
 const httpStatusTool = (function() {
@@ -3989,7 +4511,7 @@ const httpStatusTool = {
     id: "http-status",
     name: "HTTP 狀態碼對照表",
     icon: "fa-solid fa-server",
-    category: "開發與網路",
+    category: "網路與查詢",
     description: "查詢完整的 HTTP 狀態碼（1xx 至 5xx），含官方規範、詳細說明、常見原因、修復建議與 SEO 影響標籤。",
     render: (container) => {
         container.innerHTML = `
@@ -4486,7 +5008,7 @@ const mimeTypeTool = {
     id: "mime-type",
     name: "MIME 類型查詢對照表",
     icon: "fa-solid fa-file-code",
-    category: "開發與網路",
+    category: "網路與查詢",
     description: "查詢常見的 MIME Type (Multipurpose Internet Mail Extensions) 與檔案副檔名、Content-Type 標頭範例與伺服器設定。",
     render: (container) => {
         container.innerHTML = `
@@ -4809,528 +5331,6 @@ const mimeTypeTool = {
 return mimeTypeTool;
 })();
 
-// ==========================================
-// Tool: jsonFormatterTool (jsonFormatter.js)
-// ==========================================
-const jsonFormatterTool = (function() {
-/**
- * ShengTools - JSON 格式化與驗證
- */
-const jsonFormatterTool = {
-    id: "json-formatter",
-    name: "JSON 格式化與驗證",
-    icon: "fa-solid fa-code",
-    category: "開發與網路",
-    description: "美化排版 JSON 數據，支援一鍵壓縮、結構驗證與語法錯誤即時提示。",
-    render: (container) => {
-        container.innerHTML = `
-            <div class="tool-layout-container">
-                <div class="tool-info-header">
-                    <h2 class="tool-name">JSON 格式化與驗證</h2>
-                    <p class="tool-description">在左側貼上要處理的 JSON 內容，點擊「格式化」或「壓縮」進行排版。</p>
-                </div>
-                
-                <div class="tool-grid-2col">
-                    <div class="editor-panel">
-                        <div class="editor-label">
-                            <span>原始 JSON 輸入</span>
-                            <span class="category-count-badge">INPUT</span>
-                        </div>
-                        <div class="editor-textarea-wrapper">
-                            <textarea id="jsonInput" placeholder="請貼上您的 JSON 字串..."></textarea>
-                        </div>
-                    </div>
-                    <div class="editor-panel">
-                        <div class="editor-label">
-                            <span>輸出結果</span>
-                            <span class="category-count-badge">OUTPUT</span>
-                        </div>
-                        <div class="editor-textarea-wrapper">
-                            <textarea id="jsonOutput" placeholder="處理結果將在此顯示..." readonly></textarea>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="error-msg-box" id="jsonError"></div>
-                
-                <div class="tool-actions-row">
-                    <button class="tool-btn tool-btn-secondary" id="clearJsonBtn">
-                        <i class="fa-solid fa-trash-can"></i>一鍵清除
-                    </button>
-                    <button class="tool-btn tool-btn-secondary" id="minifyJsonBtn">
-                        <i class="fa-solid fa-compress"></i>壓縮 JSON
-                    </button>
-                    <button class="tool-btn tool-btn-primary" id="formatJsonBtn">
-                        <i class="fa-solid fa-code"></i>格式化 JSON
-                    </button>
-                    <button class="tool-btn tool-btn-primary" id="copyJsonBtn">
-                        <i class="fa-solid fa-copy"></i>複製結果
-                    </button>
-                </div>
-            </div>
-        `;
-
-        const input = container.querySelector("#jsonInput");
-        const output = container.querySelector("#jsonOutput");
-        const errorBox = container.querySelector("#jsonError");
-        const formatBtn = container.querySelector("#formatJsonBtn");
-        const minifyBtn = container.querySelector("#minifyJsonBtn");
-        const clearBtn = container.querySelector("#clearJsonBtn");
-        const copyBtn = container.querySelector("#copyJsonBtn");
-
-        const processJson = (format) => {
-            const val = input.value.trim();
-            if (!val) {
-                output.value = "";
-                errorBox.style.display = "none";
-                return;
-            }
-            try {
-                const parsed = JSON.parse(val);
-                errorBox.style.display = "none";
-                if (format) {
-                    output.value = JSON.stringify(parsed, null, 4);
-                } else {
-                    output.value = JSON.stringify(parsed);
-                }
-            } catch (e) {
-                errorBox.textContent = `❌ 解析失敗：${e.message}`;
-                errorBox.style.display = "block";
-                output.value = "";
-            }
-        };
-
-        formatBtn.addEventListener("click", () => processJson(true));
-        minifyBtn.addEventListener("click", () => processJson(false));
-        clearBtn.addEventListener("click", () => {
-            input.value = "";
-            output.value = "";
-            errorBox.style.display = "none";
-            input.focus();
-        });
-
-        copyBtn.addEventListener("click", () => {
-            if (!output.value) return;
-            navigator.clipboard.writeText(output.value).then(() => {
-                const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = `<i class="fa-solid fa-check"></i>已複製！`;
-                setTimeout(() => copyBtn.innerHTML = originalText, 1500);
-            });
-        });
-    }
-};
-
-return jsonFormatterTool;
-})();
-
-// ==========================================
-// Tool: regexTesterTool (regexTester.js)
-// ==========================================
-const regexTesterTool = (function() {
-/**
- * ShengTools - 正規表達式測試器
- */
-
-
-const regexTesterTool = {
-    id: "regex-tester",
-    name: "正規表達式測試器",
-    icon: "fa-solid fa-magnifying-glass-chart",
-    category: "開發與網路",
-    description: "輸入 RegExp 正則與測試文字，即時預覽高亮匹配的區段與結果。",
-    render: (container) => {
-        container.innerHTML = `
-            <div class="tool-layout-container">
-                <div class="tool-info-header">
-                    <h2 class="tool-name">正規表達式測試器</h2>
-                    <p class="tool-description">在上方輸入 Pattern，右下方即時高亮顯示符合正規條件的字串。</p>
-                </div>
-                
-                <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
-                    <div style="display: grid; grid-template-columns: 1fr 240px; gap: 16px; align-items: flex-end;">
-                        <div class="editor-panel">
-                            <label class="editor-label">正則表達式 Pattern (不用寫 / )</label>
-                            <input type="text" id="regexPattern" class="tool-input-field" placeholder="例如：[0-9]+ 或 \\w+@\\w+\\.\\w+">
-                        </div>
-                        <div class="editor-panel">
-                            <label class="editor-label">匹配 Flags</label>
-                            <div class="regex-flags-container" style="padding: 10px 0;">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="regexFlagG" checked> Global (g)
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="regexFlagI" checked> Ignore Case (i)
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="regexFlagM"> Multiline (m)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="error-msg-box" id="regexError"></div>
-                </div>
-                
-                <div class="tool-grid-2col">
-                    <div class="editor-panel">
-                        <div class="editor-label">測試文本 (Test String)</div>
-                        <div class="editor-textarea-wrapper">
-                            <textarea id="regexInput" placeholder="在此貼上要進行測試的文字內容..."></textarea>
-                        </div>
-                    </div>
-                    <div class="editor-panel">
-                        <div class="editor-label">匹配高亮結果 (Result)</div>
-                        <div class="regex-highlight-result" id="regexHighlightResult">匹配結果將在此高亮顯示...</div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const patternInput = container.querySelector("#regexPattern");
-        const testText = container.querySelector("#regexInput");
-        const resultPanel = container.querySelector("#regexHighlightResult");
-        const flagG = container.querySelector("#regexFlagG");
-        const flagI = container.querySelector("#regexFlagI");
-        const flagM = container.querySelector("#regexFlagM");
-        const errorBox = container.querySelector("#regexError");
-
-        const performMatch = () => {
-            const pattern = patternInput.value;
-            const text = testText.value;
-            errorBox.style.display = "none";
-
-            if (!pattern) {
-                resultPanel.textContent = text || "等待測試文字輸入...";
-                return;
-            }
-
-            try {
-                let flags = "";
-                if (flagG.checked) flags += "g";
-                if (flagI.checked) flags += "i";
-                if (flagM.checked) flags += "m";
-
-                const regex = new RegExp(pattern, flags);
-                const safeText = escapeHtml(text);
-
-                if (!text) {
-                    resultPanel.innerHTML = "<span style='color:var(--text-muted)'>請在左側輸入測試文字</span>";
-                    return;
-                }
-
-                let matchedHtml = safeText.replace(regex, (match) => `<mark class="regex-match">${match}</mark>`);
-                resultPanel.innerHTML = matchedHtml;
-            } catch (e) {
-                errorBox.textContent = `❌ 正規表達式語法錯誤：${e.message}`;
-                errorBox.style.display = "block";
-            }
-        };
-
-        patternInput.addEventListener("input", performMatch);
-        testText.addEventListener("input", performMatch);
-        flagG.addEventListener("change", performMatch);
-        flagI.addEventListener("change", performMatch);
-        flagM.addEventListener("change", performMatch);
-    }
-};
-
-return regexTesterTool;
-})();
-
-// ==========================================
-// Tool: converterBoxTool (converterBox.js)
-// ==========================================
-const converterBoxTool = (function() {
-/**
- * ShengTools - 進制與單位轉換器
- */
-const converterBoxTool = {
-    id: "converter-box",
-    name: "進制與單位轉換器",
-    icon: "fa-solid fa-calculator",
-    category: "開發與網路",
-    description: "整合多重進制聯動換算（二/八/十/十六進制）與長度、重量、溫度、面積常用單位雙向計算。",
-    render: (container) => {
-        container.innerHTML = `
-            <div class="tool-layout-container">
-                <div class="tool-info-header">
-                    <h2 class="tool-name">進制與單位轉換器</h2>
-                    <p class="tool-description">採用子標籤設計，快速切換進制或各類度量單位進行動態雙向聯動轉換。</p>
-                </div>
-                
-                <!-- 子標籤切換 -->
-                <div class="tool-sub-tabs">
-                    <button class="sub-tab active" id="tabBaseBtn" data-tab="base">進制聯動轉換</button>
-                    <button class="sub-tab" id="tabUnitBtn" data-tab="unit">度量單位轉換</button>
-                </div>
-                
-                <!-- 進制內容區 -->
-                <div class="converter-card" id="baseConverterPanel">
-                    <h3 class="palette-section-title"><i class="fa-solid fa-circle-nodes"></i> 多進制雙向同步 (輸入即時換算)</h3>
-                    <div class="base-converter-grid" style="margin-top: 10px;">
-                        <div class="editor-panel">
-                            <label class="editor-label">十進制 (Decimal)</label>
-                            <input type="text" id="baseDec" class="tool-input-field" placeholder="請輸入十進制數值，例如：255" autocomplete="off">
-                        </div>
-                        <div class="editor-panel">
-                            <label class="editor-label">二進制 (Binary)</label>
-                            <input type="text" id="baseBin" class="tool-input-field" placeholder="請輸入二進制，例如：11111111" autocomplete="off">
-                        </div>
-                        <div class="editor-panel">
-                            <label class="editor-label">八進制 (Octal)</label>
-                            <input type="text" id="baseOct" class="tool-input-field" placeholder="請輸入八進制，例如：377" autocomplete="off">
-                        </div>
-                        <div class="editor-panel">
-                            <label class="editor-label">十六進制 (Hexadecimal)</label>
-                            <input type="text" id="baseHex" class="tool-input-field" placeholder="請輸入十六進制，例如：FF" autocomplete="off">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 單位內容區 (預設隱藏) -->
-                <div class="converter-card" id="unitConverterPanel" style="display: none;">
-                    <h3 class="palette-section-title"><i class="fa-solid fa-ruler-combined"></i> 物理單位轉換</h3>
-                    <div style="display:flex; flex-direction:column; gap:20px; margin-top:10px;">
-                        <div class="editor-panel" style="max-width: 300px;">
-                            <label class="editor-label">選擇轉換類別</label>
-                            <select id="unitCategorySelect" class="tool-select-field">
-                                <option value="length" selected>長度單位 (Length)</option>
-                                <option value="weight">重量單位 (Weight)</option>
-                                <option value="temp">溫度單位 (Temperature)</option>
-                                <option value="area">面積單位 (Area)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="unit-converter-grid">
-                            <!-- 左側輸入 -->
-                            <div style="display:flex; flex-direction:column; gap:10px;">
-                                <input type="number" id="unitInputLeft" class="tool-input-field" value="1">
-                                <select id="unitSelectLeft" class="tool-select-field"></select>
-                            </div>
-                            
-                            <!-- 交換按鈕 -->
-                            <div class="unit-swap-icon" id="unitSwapBtn">
-                                <i class="fa-solid fa-right-left"></i>
-                            </div>
-                            
-                            <!-- 右側輸出 -->
-                            <div style="display:flex; flex-direction:column; gap:10px;">
-                                <input type="number" id="unitInputRight" class="tool-input-field" value="1000">
-                                <select id="unitSelectRight" class="tool-select-field"></select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // 1. 子頁籤切換邏輯
-        const tabBaseBtn = container.querySelector("#tabBaseBtn");
-        const tabUnitBtn = container.querySelector("#tabUnitBtn");
-        const basePanel = container.querySelector("#baseConverterPanel");
-        const unitPanel = container.querySelector("#unitConverterPanel");
-
-        tabBaseBtn.addEventListener("click", () => {
-            tabBaseBtn.classList.add("active");
-            tabUnitBtn.classList.remove("active");
-            basePanel.style.display = "block";
-            unitPanel.style.display = "none";
-        });
-
-        tabUnitBtn.addEventListener("click", () => {
-            tabUnitBtn.classList.add("active");
-            tabBaseBtn.classList.remove("active");
-            unitPanel.style.display = "block";
-            basePanel.style.display = "none";
-        });
-
-        // 2. 進制聯動轉換邏輯
-        const decInput = container.querySelector("#baseDec");
-        const binInput = container.querySelector("#baseBin");
-        const octInput = container.querySelector("#baseOct");
-        const hexInput = container.querySelector("#baseHex");
-
-        const updateAllBases = (decimalValue, sourceInput) => {
-            if (isNaN(decimalValue) || decimalValue === null) {
-                if (sourceInput !== decInput) decInput.value = "";
-                if (sourceInput !== binInput) binInput.value = "";
-                if (sourceInput !== octInput) octInput.value = "";
-                if (sourceInput !== hexInput) hexInput.value = "";
-                return;
-            }
-            if (sourceInput !== decInput) decInput.value = decimalValue.toString(10);
-            if (sourceInput !== binInput) binInput.value = decimalValue.toString(2);
-            if (sourceInput !== octInput) octInput.value = decimalValue.toString(8);
-            if (sourceInput !== hexInput) hexInput.value = decimalValue.toString(16).toUpperCase();
-        };
-
-        decInput.addEventListener("input", () => {
-            const cleaned = decInput.value.replace(/[^0-9\-]/g, "");
-            decInput.value = cleaned;
-            const val = parseInt(cleaned, 10);
-            updateAllBases(isNaN(val) ? null : val, decInput);
-        });
-
-        binInput.addEventListener("input", () => {
-            const cleaned = binInput.value.replace(/[^01]/g, "");
-            binInput.value = cleaned;
-            const val = parseInt(cleaned, 2);
-            updateAllBases(isNaN(val) ? null : val, binInput);
-        });
-
-        octInput.addEventListener("input", () => {
-            const cleaned = octInput.value.replace(/[^0-7]/g, "");
-            octInput.value = cleaned;
-            const val = parseInt(cleaned, 8);
-            updateAllBases(isNaN(val) ? null : val, octInput);
-        });
-
-        hexInput.addEventListener("input", () => {
-            const cleaned = hexInput.value.replace(/[^0-9A-Fa-f]/g, "");
-            hexInput.value = cleaned.toUpperCase();
-            const val = parseInt(cleaned, 16);
-            updateAllBases(isNaN(val) ? null : val, hexInput);
-        });
-
-        // 3. 單位轉換配置與邏輯
-        const unitConfig = {
-            length: {
-                label: "長度",
-                units: {
-                    m: { label: "公尺 (m)", val: 1 },
-                    cm: { label: "公分 (cm)", val: 0.01 },
-                    mm: { label: "公厘 (mm)", val: 0.001 },
-                    km: { label: "公里 (km)", val: 1000 },
-                    in: { label: "英吋 (in)", val: 0.0254 },
-                    ft: { label: "英呎 (ft)", val: 0.3048 },
-                    yd: { label: "碼 (yd)", val: 0.9144 }
-                }
-            },
-            weight: {
-                label: "重量",
-                units: {
-                    kg: { label: "公斤 (kg)", val: 1 },
-                    g: { label: "公克 (g)", val: 0.001 },
-                    lb: { label: "磅 (lb)", val: 0.45359237 },
-                    oz: { label: "盎司 (oz)", val: 0.028349523 },
-                    tw: { label: "台斤", val: 0.6 }
-                }
-            },
-            temp: {
-                label: "溫度",
-                units: {
-                    c: { label: "攝氏 (°C)" },
-                    f: { label: "華氏 (°F)" },
-                    k: { label: "克氏 (K)" }
-                }
-            },
-            area: {
-                label: "面積",
-                units: {
-                    m2: { label: "平方公尺 (㎡)", val: 1 },
-                    cm2: { label: "平方公分 (㎠)", val: 0.0001 },
-                    km2: { label: "平方公里 (㎢)", val: 1000000 },
-                    hectare: { label: "公頃", val: 10000 },
-                    ping: { label: "坪", val: 3.305785 },
-                    acre: { label: "英畝", val: 4046.8564 }
-                }
-            }
-        };
-
-        const catSelect = container.querySelector("#unitCategorySelect");
-        const leftInput = container.querySelector("#unitInputLeft");
-        const rightInput = container.querySelector("#unitInputRight");
-        const leftSelect = container.querySelector("#unitSelectLeft");
-        const rightSelect = container.querySelector("#unitSelectRight");
-        const swapBtn = container.querySelector("#unitSwapBtn");
-
-        const populateUnits = () => {
-            const cat = catSelect.value;
-            const units = unitConfig[cat].units;
-            
-            let selectHtml = "";
-            for (const [key, details] of Object.entries(units)) {
-                selectHtml += `<option value="${key}">${details.label}</option>`;
-            }
-            
-            leftSelect.innerHTML = selectHtml;
-            rightSelect.innerHTML = selectHtml;
-
-            // 預設將左右設為不同單位
-            const keys = Object.keys(units);
-            if (keys.length > 1) {
-                leftSelect.selectedIndex = 0;
-                rightSelect.selectedIndex = 1;
-            }
-        };
-
-        const performConvert = (direction) => {
-            const cat = catSelect.value;
-            const fromUnit = direction === "left-to-right" ? leftSelect.value : rightSelect.value;
-            const toUnit = direction === "left-to-right" ? rightSelect.value : leftSelect.value;
-            const inputField = direction === "left-to-right" ? leftInput : rightInput;
-            const outputField = direction === "left-to-right" ? rightInput : leftInput;
-
-            const val = parseFloat(inputField.value);
-            if (isNaN(val)) {
-                outputField.value = "";
-                return;
-            }
-
-            // 溫度特殊公式轉換
-            if (cat === "temp") {
-                let tempInCelsius = val;
-                if (fromUnit === "f") tempInCelsius = (val - 32) * 5 / 9;
-                if (fromUnit === "k") tempInCelsius = val - 273.15;
-
-                let finalTemp = tempInCelsius;
-                if (toUnit === "f") finalTemp = tempInCelsius * 9 / 5 + 32;
-                if (toUnit === "k") finalTemp = tempInCelsius + 273.15;
-
-                outputField.value = parseFloat(finalTemp.toFixed(4));
-            } else {
-                // 比率係數轉換
-                const baseCoeff = unitConfig[cat].units[fromUnit].val;
-                const targetCoeff = unitConfig[cat].units[toUnit].val;
-                const converted = (val * baseCoeff) / targetCoeff;
-                outputField.value = parseFloat(converted.toFixed(6));
-            }
-        };
-
-        // 監聽單位類別改變
-        catSelect.addEventListener("change", () => {
-            populateUnits();
-            performConvert("left-to-right");
-        });
-
-        // 監聽數值輸入與選單改變
-        leftInput.addEventListener("input", () => performConvert("left-to-right"));
-        rightInput.addEventListener("input", () => performConvert("right-to-left"));
-        leftSelect.addEventListener("change", () => performConvert("left-to-right"));
-        rightSelect.addEventListener("change", () => performConvert("left-to-right"));
-
-        // 交換單位與數值
-        swapBtn.addEventListener("click", () => {
-            const tempSelect = leftSelect.value;
-            leftSelect.value = rightSelect.value;
-            rightSelect.value = tempSelect;
-
-            const tempInput = leftInput.value;
-            leftInput.value = rightInput.value;
-            rightInput.value = tempInput;
-
-            performConvert("left-to-right");
-        });
-
-        // 初始載入單位選項
-        populateUnits();
-        performConvert("left-to-right");
-    }
-};
-
-return converterBoxTool;
-})();
-
 
 
 // ==========================================
@@ -5338,25 +5338,25 @@ return converterBoxTool;
 // ==========================================
 const toolsConfig = [
     textCompareTool,
-    markdownEditorTool,
+    jsonFormatterTool,
     wordCounterTool,
     caseConverterTool,
     textDedupTool,
+    markdownEditorTool,
     jweHelperTool,
     companyCryptoTool,
     hashGeneratorTool,
     base64CodecTool,
     urlCodecTool,
-    colorToolsTool,
-    qrGeneratorTool,
-    luckyWheelTool,
-    dateCalculatorTool,
-    currencyConverterTool,
-    httpStatusTool,
-    mimeTypeTool,
-    jsonFormatterTool,
     regexTesterTool,
-    converterBoxTool
+    currencyConverterTool,
+    dateCalculatorTool,
+    converterBoxTool,
+    colorToolsTool,
+    luckyWheelTool,
+    qrGeneratorTool,
+    httpStatusTool,
+    mimeTypeTool
 ];
 
 
@@ -5641,10 +5641,10 @@ function renderHomeView(container, filteredTools) {
     } else {
         for (const [categoryName, tools] of Object.entries(grouped)) {
             let catIcon = "fa-solid fa-toolbox";
-            if (categoryName === "文字處理") catIcon = "fa-solid fa-pen-nib";
-            else if (categoryName === "安全與加解密") catIcon = "fa-solid fa-shield-halved";
-            else if (categoryName === "實用與設計") catIcon = "fa-solid fa-cubes";
-            else if (categoryName === "開發與網路") catIcon = "fa-solid fa-laptop-code";
+            if (categoryName === "文字與格式") catIcon = "fa-solid fa-pen-nib";
+            else if (categoryName === "安全與開發") catIcon = "fa-solid fa-shield-halved";
+            else if (categoryName === "實用與生活") catIcon = "fa-solid fa-cubes";
+            else if (categoryName === "網路與查詢") catIcon = "fa-solid fa-globe";
 
             blocksHtml += `
                 <div class="category-block" data-category="${categoryName}">

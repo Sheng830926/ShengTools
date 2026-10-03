@@ -7,7 +7,7 @@ export const markdownEditorTool = {
     id: "markdown-editor",
     name: "Markdown 編輯器",
     icon: "fa-solid fa-file-pen",
-    category: "文字處理",
+    category: "文字與格式",
     description: "線上 Markdown 即時編輯排版與預覽，支援標題、代碼塊、粗體與引用語法。",
     render: (container) => {
         container.innerHTML = `

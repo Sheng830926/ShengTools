@@ -10,35 +10,35 @@ utilsCode = utilsCode.replace(/export function /g, 'function ')
                      .replace(/export const /g, 'const ')
                      .replace(/export let /g, 'let ');
 
-// 2. The 20 tools in exact Scheme A category order
+// 2. The 20 tools in exact user-specified order
 const toolsList = [
-    // 1. 文字處理
+    // 1. ✍️ 文字與格式 (6 款)
     { file: 'textCompare.js', name: 'textCompareTool' },
-    { file: 'markdownEditor.js', name: 'markdownEditorTool' },
+    { file: 'jsonFormatter.js', name: 'jsonFormatterTool' },
     { file: 'wordCounter.js', name: 'wordCounterTool' },
     { file: 'caseConverter.js', name: 'caseConverterTool' },
     { file: 'textDedup.js', name: 'textDedupTool' },
+    { file: 'markdownEditor.js', name: 'markdownEditorTool' },
 
-    // 2. 安全與加解密
+    // 2. 🔐 安全與開發 (6 款)
     { file: 'jweHelper.js', name: 'jweHelperTool' },
     { file: 'companyCrypto.js', name: 'companyCryptoTool' },
     { file: 'hashGenerator.js', name: 'hashGeneratorTool' },
     { file: 'base64Codec.js', name: 'base64CodecTool' },
     { file: 'urlCodec.js', name: 'urlCodecTool' },
-
-    // 3. 實用與設計
-    { file: 'colorTools.js', name: 'colorToolsTool' },
-    { file: 'qrGenerator.js', name: 'qrGeneratorTool' },
-    { file: 'luckyWheel.js', name: 'luckyWheelTool' },
-    { file: 'dateCalculator.js', name: 'dateCalculatorTool' },
-    { file: 'currencyConverter.js', name: 'currencyConverterTool' },
-
-    // 4. 開發與網路
-    { file: 'httpStatus.js', name: 'httpStatusTool' },
-    { file: 'mimeType.js', name: 'mimeTypeTool' },
-    { file: 'jsonFormatter.js', name: 'jsonFormatterTool' },
     { file: 'regexTester.js', name: 'regexTesterTool' },
-    { file: 'converterBox.js', name: 'converterBoxTool' }
+
+    // 3. 🛠️ 實用與生活 (6 款)
+    { file: 'currencyConverter.js', name: 'currencyConverterTool' },
+    { file: 'dateCalculator.js', name: 'dateCalculatorTool' },
+    { file: 'converterBox.js', name: 'converterBoxTool' },
+    { file: 'colorTools.js', name: 'colorToolsTool' },
+    { file: 'luckyWheel.js', name: 'luckyWheelTool' },
+    { file: 'qrGenerator.js', name: 'qrGeneratorTool' },
+
+    // 4. 🌐 網路與查詢 (2 款)
+    { file: 'httpStatus.js', name: 'httpStatusTool' },
+    { file: 'mimeType.js', name: 'mimeTypeTool' }
 ];
 
 let toolsCode = '';

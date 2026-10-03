@@ -7,7 +7,7 @@ export const base64CodecTool = {
     id: "base64-codec",
     name: "Base64 編解碼器",
     icon: "fa-solid fa-key",
-    category: "安全與加解密",
+    category: "安全與開發",
     description: "對文字字串進行 Base64 的編碼與解碼，完整支援萬國碼 (UTF-8) 不會產生亂碼。",
     render: (container) => {
         container.innerHTML = `

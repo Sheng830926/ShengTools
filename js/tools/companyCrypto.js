@@ -85,7 +85,7 @@ export const companyCryptoTool = {
     id: "company-crypto",
     name: "公司加解密工具",
     icon: "fa-solid fa-building-lock",
-    category: "安全與加解密",
+    category: "安全與開發",
     description: "相容 C# AesEncryptBase64 / AesDecryptBase64 專案內部 AES-256-CBC 加解密，支援自訂 Key 與 IV。",
     render: (container) => {
         container.innerHTML = `
