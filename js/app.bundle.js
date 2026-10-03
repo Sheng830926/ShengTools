@@ -5385,6 +5385,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initSidebarMobile();  // 初始化手機響應式側邊欄
     initTabsState();      // 初始化多分頁標籤狀態與動作按鈕
     initSearch();         // 初始化工具搜尋功能
+    initCommandPalette(); // 初始化全域 Ctrl+K 快捷搜尋視窗
     initRouter();         // 啟動路由監聽
 });
 
@@ -5557,6 +5558,166 @@ function initSearch() {
             updateView();
         });
     }
+}
+
+/**
+ * 全域 Command Palette (Ctrl+K 快捷搜尋視窗)
+ */
+function initCommandPalette() {
+    const modal = document.getElementById("commandPaletteModal");
+    const input = document.getElementById("cmdPaletteInput");
+    const resultsContainer = document.getElementById("cmdResultsList");
+    const quickSearchBtn = document.getElementById("quickSearchBtn");
+    const closeBtn = document.getElementById("cmdCloseBtn");
+
+    if (!modal || !input || !resultsContainer) return;
+
+    let selectedIndex = 0;
+    let currentResults = [];
+
+    const openPalette = () => {
+        modal.style.display = "flex";
+        input.value = "";
+        selectedIndex = 0;
+        renderResults("");
+        setTimeout(() => input.focus(), 50);
+    };
+
+    const closePalette = () => {
+        modal.style.display = "none";
+    };
+
+    const renderResults = (query) => {
+        const q = query.trim().toLowerCase();
+        currentResults = toolsConfig.filter(tool => {
+            if (!q) return true;
+            return tool.name.toLowerCase().includes(q) ||
+                   tool.description.toLowerCase().includes(q) ||
+                   tool.category.toLowerCase().includes(q);
+        });
+
+        if (currentResults.length === 0) {
+            resultsContainer.innerHTML = `
+                <div class="cmd-empty-tip">
+                    <i class="fa-solid fa-magnifying-glass" style="margin-bottom:8px; opacity:0.5; font-size:1.5rem; display:block;"></i>
+                    <div>找不到符合「${query}」的工具</div>
+                </div>
+            `;
+            return;
+        }
+
+        if (selectedIndex >= currentResults.length) {
+            selectedIndex = 0;
+        }
+
+        resultsContainer.innerHTML = currentResults.map((tool, idx) => `
+            <div class="cmd-result-item ${idx === selectedIndex ? 'selected' : ''}" data-index="${idx}" data-tool-id="${tool.id}">
+                <div class="cmd-item-left">
+                    <div class="cmd-item-icon">
+                        <i class="${tool.icon}"></i>
+                    </div>
+                    <div class="cmd-item-info">
+                        <div class="cmd-item-name">${tool.name}</div>
+                        <div class="cmd-item-desc">${tool.description}</div>
+                    </div>
+                </div>
+                <span class="cmd-item-badge">${tool.category}</span>
+            </div>
+        `).join("");
+
+        // 綁定點擊與滑鼠懸浮事件
+        resultsContainer.querySelectorAll(".cmd-result-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const toolId = item.getAttribute("data-tool-id");
+                closePalette();
+                window.location.hash = `#/${toolId}`;
+            });
+            item.addEventListener("mouseenter", () => {
+                selectedIndex = parseInt(item.getAttribute("data-index"), 10);
+                updateSelectedClass();
+            });
+        });
+
+        scrollSelectedIntoView();
+    };
+
+    const updateSelectedClass = () => {
+        const items = resultsContainer.querySelectorAll(".cmd-result-item");
+        items.forEach((el, idx) => {
+            if (idx === selectedIndex) {
+                el.classList.add("selected");
+            } else {
+                el.classList.remove("selected");
+            }
+        });
+    };
+
+    const scrollSelectedIntoView = () => {
+        const selectedEl = resultsContainer.querySelector(".cmd-result-item.selected");
+        if (selectedEl) {
+            selectedEl.scrollIntoView({ block: "nearest" });
+        }
+    };
+
+    input.addEventListener("input", (e) => {
+        selectedIndex = 0;
+        renderResults(e.target.value);
+    });
+
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (currentResults.length > 0) {
+                selectedIndex = (selectedIndex + 1) % currentResults.length;
+                updateSelectedClass();
+                scrollSelectedIntoView();
+            }
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (currentResults.length > 0) {
+                selectedIndex = (selectedIndex - 1 + currentResults.length) % currentResults.length;
+                updateSelectedClass();
+                scrollSelectedIntoView();
+            }
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (currentResults.length > 0 && currentResults[selectedIndex]) {
+                const tool = currentResults[selectedIndex];
+                closePalette();
+                window.location.hash = `#/${tool.id}`;
+            }
+        } else if (e.key === "Escape") {
+            e.preventDefault();
+            closePalette();
+        }
+    });
+
+    if (quickSearchBtn) {
+        quickSearchBtn.addEventListener("click", openPalette);
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closePalette);
+    }
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            closePalette();
+        }
+    });
+
+    // 全域鍵盤監聽 Ctrl+K / Cmd+K / Escape
+    window.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+            e.preventDefault();
+            if (modal.style.display === "flex") {
+                closePalette();
+            } else {
+                openPalette();
+            }
+        } else if (e.key === "Escape" && modal.style.display === "flex") {
+            closePalette();
+        }
+    });
 }
 
 /**
@@ -5733,7 +5894,7 @@ function renderContent(filteredTools, activeId) {
     if (!viewport) return;
 
     if (activeId === "home") {
-        headerTitle.textContent = "首頁";
+        if (headerTitle) headerTitle.textContent = "首頁";
         document.title = "ShengTools | 多功能工具箱";
         renderHomeView(viewport, filteredTools);
         return;
@@ -5741,12 +5902,12 @@ function renderContent(filteredTools, activeId) {
 
     const matchedTool = toolsConfig.find(tool => tool.id === activeId);
     if (matchedTool) {
-        headerTitle.textContent = matchedTool.name;
+        if (headerTitle) headerTitle.textContent = matchedTool.name;
         document.title = `${matchedTool.name} | ShengTools`;
         viewport.innerHTML = "";
         matchedTool.render(viewport);
     } else {
-        headerTitle.textContent = "首頁";
+        if (headerTitle) headerTitle.textContent = "首頁";
         document.title = "ShengTools | 多功能工具箱";
         window.location.hash = "#/";
     }
@@ -5758,11 +5919,32 @@ function renderContent(filteredTools, activeId) {
 function renderHomeView(container, filteredTools) {
     const allCategories = [...new Set(toolsConfig.map(t => t.category))];
 
+    // 計算每個類別工具數量
+    const categoryCounts = {
+        all: toolsConfig.length
+    };
+    allCategories.forEach(cat => {
+        categoryCounts[cat] = toolsConfig.filter(t => t.category === cat).length;
+    });
+
+    const categoryIcons = {
+        "文字與格式": "fa-solid fa-pen-nib",
+        "安全與開發": "fa-solid fa-shield-halved",
+        "實用與生活": "fa-solid fa-cubes",
+        "網路與查詢": "fa-solid fa-globe"
+    };
+
     const tabsHtml = `
         <div class="home-category-filters">
-            <button class="filter-tab ${appState.selectedCategory === "all" ? "active" : ""}" data-category="all">全部工具</button>
+            <button class="filter-tab ${appState.selectedCategory === "all" ? "active" : ""}" data-category="all">
+                <span>全部工具</span>
+                <span class="filter-badge">${categoryCounts.all}</span>
+            </button>
             ${allCategories.map(cat => `
-                <button class="filter-tab ${appState.selectedCategory === cat ? "active" : ""}" data-category="${cat}">${cat}</button>
+                <button class="filter-tab ${appState.selectedCategory === cat ? "active" : ""}" data-category="${cat}">
+                    <span>${cat}</span>
+                    <span class="filter-badge">${categoryCounts[cat] || 0}</span>
+                </button>
             `).join("")}
         </div>
     `;
@@ -5793,11 +5975,7 @@ function renderHomeView(container, filteredTools) {
         `;
     } else {
         for (const [categoryName, tools] of Object.entries(grouped)) {
-            let catIcon = "fa-solid fa-toolbox";
-            if (categoryName === "文字與格式") catIcon = "fa-solid fa-pen-nib";
-            else if (categoryName === "安全與開發") catIcon = "fa-solid fa-shield-halved";
-            else if (categoryName === "實用與生活") catIcon = "fa-solid fa-cubes";
-            else if (categoryName === "網路與查詢") catIcon = "fa-solid fa-globe";
+            const catIcon = categoryIcons[categoryName] || "fa-solid fa-toolbox";
 
             blocksHtml += `
                 <div class="category-block" data-category="${categoryName}">
@@ -5805,7 +5983,7 @@ function renderHomeView(container, filteredTools) {
                         <h3 class="category-block-title">
                             <i class="${catIcon}"></i> ${categoryName}
                         </h3>
-                        <span class="category-count-badge">共 ${tools.length} 個項目</span>
+                        <span class="category-count-badge">${tools.length} 款工具</span>
                     </div>
                     <div class="tools-grid">
                         ${tools.map(tool => `
@@ -5817,11 +5995,11 @@ function renderHomeView(container, filteredTools) {
                                     <span class="card-badge">${tool.category}</span>
                                 </div>
                                 <div class="card-body">
-                                    <h4 class="card-title">${tool.name}</h4>
+                                    <div class="card-title-row">
+                                        <h4 class="card-title">${tool.name}</h4>
+                                        <i class="fa-solid fa-arrow-right card-arrow"></i>
+                                    </div>
                                     <p class="card-desc">${tool.description}</p>
-                                </div>
-                                <div class="card-footer">
-                                    立即開啟 <i class="fa-solid fa-arrow-right-long"></i>
                                 </div>
                             </div>
                         `).join("")}
@@ -5860,7 +6038,7 @@ function renderHomeView(container, filteredTools) {
             
             ${tabsHtml}
             
-            <div class="home-blocks-container" style="display:flex; flex-direction:column; gap:36px;">
+            <div class="home-blocks-container" style="display:flex; flex-direction:column; gap:28px;">
                 ${blocksHtml}
             </div>
         </div>

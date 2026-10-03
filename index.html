@@ -75,43 +75,61 @@
         
         <!-- 右側主要內容區 -->
         <main class="main-content" id="mainContent">
-            <!-- 頂部導航列 (行動裝置主要使用) -->
-            <header class="main-header">
-                <div class="header-left">
-                    <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="開啟側邊選單">
+            <!-- 一體化精緻頂部導航與多分頁標籤列 (Unified Header + Tabs Bar) -->
+            <header class="unified-top-bar" id="unifiedTopBar">
+                <div class="top-bar-left">
+                    <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="開啟側邊選單" title="側邊選單">
                         <i class="fa-solid fa-bars"></i>
                     </button>
-                    <h1 class="header-title" id="headerTitle">首頁</h1>
+                    <div class="tabs-container" id="tabsContainer">
+                        <!-- 分頁標籤項目由 JavaScript 動態生成 -->
+                    </div>
                 </div>
-                <div class="header-right">
-                    <!-- 行動版頂部主題切換按鈕 -->
-                    <button class="header-theme-toggle" id="headerThemeToggleBtn" aria-label="切換深色/淺色模式">
+                
+                <div class="top-bar-right">
+                    <!-- 快捷搜尋按鈕 (Ctrl+K) -->
+                    <button class="quick-search-trigger" id="quickSearchBtn" title="快速搜尋工具 (Ctrl+K)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span class="search-hint-text">搜尋工具...</span>
+                        <kbd class="shortcut-badge">Ctrl K</kbd>
+                    </button>
+                    
+                    <!-- 關閉所有工具分頁按鈕 -->
+                    <button class="top-bar-action-btn" id="tabCloseAllBtn" title="關閉所有工具分頁">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    
+                    <!-- 頂部主題切換按鈕 -->
+                    <button class="top-bar-action-btn" id="headerThemeToggleBtn" aria-label="切換深色/淺色模式" title="切換深色/淺色模式">
                         <i class="fa-solid fa-moon dark-icon"></i>
                         <i class="fa-solid fa-sun light-icon"></i>
                     </button>
                 </div>
             </header>
             
-            <!-- 多分頁標籤列 (Chrome-like Tab Bar) -->
-            <div class="tabs-bar-wrapper" id="tabsBarWrapper">
-                <div class="tabs-container" id="tabsContainer">
-                    <!-- 分頁標籤項目由 JavaScript 動態生成 -->
-                </div>
-                <div class="tabs-actions">
-                    <button class="tab-action-btn" id="tabHomeBtn" title="回到首頁總覽">
-                        <i class="fa-solid fa-house"></i>
-                    </button>
-                    <button class="tab-action-btn" id="tabCloseAllBtn" title="關閉所有工具分頁">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-            </div>
-            
             <!-- 工具主渲染區域 (SPA 內容動態替換) -->
-            <div class="tool-viewport" id="toolViewport">
+            <div class="tool-viewport bg-dot-grid" id="toolViewport">
                 <!-- 預設顯示首頁內容，會由 JavaScript 動態載入 -->
             </div>
         </main>
+    </div>
+    
+    <!-- Command Palette (Ctrl+K 快捷搜尋彈窗) -->
+    <div class="command-palette-backdrop" id="commandPaletteModal" style="display: none;">
+        <div class="command-palette-box">
+            <div class="cmd-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass cmd-search-icon"></i>
+                <input type="text" id="cmdPaletteInput" placeholder="搜尋工具名稱、功能、分類... (按 ↑↓ 選擇)" autocomplete="off">
+                <span class="cmd-esc-badge" id="cmdCloseBtn" title="關閉 (ESC)">ESC</span>
+            </div>
+            <div class="cmd-results-list" id="cmdResultsList">
+                <!-- 動態注入搜尋結果清單 -->
+            </div>
+            <div class="cmd-footer-bar">
+                <span class="cmd-footer-tip"><kbd>↑</kbd> <kbd>↓</kbd> 選擇，<kbd>Enter</kbd> 開啟分頁</span>
+                <span class="cmd-footer-tip"><kbd>ESC</kbd> 關閉視窗</span>
+            </div>
+        </div>
     </div>
     
     <!-- 引入打包版 JavaScript (支援本地 file:// 直接點擊開啟與離線使用) -->
