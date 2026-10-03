@@ -472,8 +472,26 @@ function renderHomeView(container, filteredTools) {
         <div class="home-wrapper">
             <section class="hero-section">
                 <div class="hero-content">
-                    <h2 class="hero-title">全方位線上多功能工具箱</h2>
-                    <p class="hero-desc">純前端線上工具集。無廣告、無後端傳輸，100% 本地安全執行。</p>
+                    <div class="hero-title-row">
+                        <span class="hero-brand-title">ShengTools 工具箱</span>
+                        <span class="hero-dot-separator"></span>
+                        <span class="hero-tagline">純前端極致體驗</span>
+                    </div>
+                    <p class="hero-desc">免伺服器傳輸，零資料上傳外洩風險，100% 瀏覽器本地安全運算。</p>
+                </div>
+                <div class="hero-stats-chips">
+                    <div class="hero-stat-chip">
+                        <div class="hero-stat-number stat-indigo">20</div>
+                        <div class="hero-stat-label">收錄工具</div>
+                    </div>
+                    <div class="hero-stat-chip">
+                        <div class="hero-stat-number stat-purple">4</div>
+                        <div class="hero-stat-label">核心類別</div>
+                    </div>
+                    <div class="hero-stat-chip">
+                        <div class="hero-stat-number stat-emerald">0ms</div>
+                        <div class="hero-stat-label">網路延遲</div>
+                    </div>
                 </div>
             </section>
             
