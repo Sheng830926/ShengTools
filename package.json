@@ -1,0 +1,9 @@
+{
+  "name": "shengtools",
+  "version": "1.0.0",
+  "description": "ShengTools - 全方位線上與離線多功能工具箱",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "license": "MIT"
+}

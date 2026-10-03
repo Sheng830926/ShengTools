@@ -121,22 +121,22 @@ ShengTools/
 
 ## 💻 本地開啟與開發 (Local Development)
 
-由於專案採用原生 ES Modules，**不可直接雙擊開啟 `index.html`**（瀏覽器 CORS 限制），需透過 HTTP 伺服器：
+### 🚀 方法 1：直接雙擊 index.html 開啟（最簡單、100% 離線可用）
+- 支援直接點擊 `index.html` 開啟，無需架設伺服器或連網，在瀏覽器本地即可直接使用所有工具！
 
-### 方法 1：VS Code Live Server（推薦）
+### 🌐 方法 2：VS Code Live Server 或本地伺服器
 ```bash
-# 1. 安裝 VS Code 擴充套件「Live Server」(Ritwick Dey)
-# 2. 在 index.html 右鍵 → Open with Live Server
-# 3. 瀏覽器自動開啟 http://127.0.0.1:5500
-```
-
-### 方法 2：Python
-```bash
-git clone https://github.com/Sheng830926/ShengTools.git
-cd ShengTools
+# 使用 VS Code Live Server 插件點擊「Go Live」
+# 或使用 Python 啟動伺服器：
 python -m http.server 8000
-# 開啟 http://localhost:8000
 ```
+
+### 🔨 重新打包指引（當修改 js/tools/ 中的工具時）
+若有修改 `js/tools/` 底下的個別工具原始碼，只需在專案目錄執行：
+```bash
+node build.js
+```
+即會自動將所有工具快速封裝至 `js/app.bundle.js`，保持離線與直接開啟的最佳相容性。
 
 ---
 
