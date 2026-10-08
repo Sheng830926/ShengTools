@@ -527,6 +527,18 @@ button {
     flex-direction: column;
 }
 
+/* 分頁面板持久化容器 (Keep-Alive Multi-Tab Panels) */
+.tool-tab-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.tool-tab-panel.tab-panel-hidden {
+    display: none !important;
+}
+
 /* --------------------------------------------------------------------------
    4. 首頁分類分區樣式 (Home & Grouped Layout)
    -------------------------------------------------------------------------- */

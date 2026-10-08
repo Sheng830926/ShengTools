@@ -130,6 +130,7 @@ function initTabsState() {
             if (appState.openTabs.length === 0) return;
             appState.openTabs = [];
             saveTabsState();
+            removeAllToolPanels();
             window.location.hash = "#/";
         });
     }
@@ -151,6 +152,9 @@ function closeTab(tabId) {
     appState.openTabs.splice(idx, 1);
     saveTabsState();
 
+    // 關閉分頁時清除該工具的持久化 DOM 面板，下次開啟時重設
+    removeToolPanel(tabId);
+
     // 如果關閉的是當前作用中的分頁，切換至相鄰分頁或首頁
     if (appState.activeToolId === tabId) {
         if (appState.openTabs.length > 0) {
@@ -162,6 +166,24 @@ function closeTab(tabId) {
     } else {
         renderTabsBar(appState.activeToolId);
     }
+}
+
+/**
+ * 移除單一工具分頁的 DOM 面板
+ */
+function removeToolPanel(tabId) {
+    const panel = document.getElementById(`tab-panel-${tabId}`);
+    if (panel) {
+        panel.remove();
+    }
+}
+
+/**
+ * 移除所有工具分頁的 DOM 面板 (保留首頁)
+ */
+function removeAllToolPanels() {
+    const panels = document.querySelectorAll(".tool-tab-panel:not(#tab-panel-home)");
+    panels.forEach(p => p.remove());
 }
 
 /**
@@ -530,10 +552,27 @@ function renderContent(filteredTools, activeId) {
     const headerTitle = document.getElementById("headerTitle");
     if (!viewport) return;
 
+    // 確保首頁專屬容器面板存在
+    let homePanel = document.getElementById("tab-panel-home");
+    if (!homePanel) {
+        homePanel = document.createElement("div");
+        homePanel.id = "tab-panel-home";
+        homePanel.className = "tool-tab-panel";
+        viewport.appendChild(homePanel);
+    }
+
     if (activeId === "home") {
         if (headerTitle) headerTitle.textContent = "首頁";
         document.title = "ShengTools | 多功能工具箱";
-        renderHomeView(viewport, filteredTools);
+
+        // 顯示首頁面板，隱藏所有其他分頁面板 (完全保留輸入值與狀態)
+        homePanel.classList.remove("tab-panel-hidden");
+        viewport.querySelectorAll(".tool-tab-panel:not(#tab-panel-home)").forEach(p => {
+            p.classList.add("tab-panel-hidden");
+        });
+
+        // 渲染首頁總覽內容
+        renderHomeView(homePanel, filteredTools);
         return;
     }
 
@@ -541,8 +580,29 @@ function renderContent(filteredTools, activeId) {
     if (matchedTool) {
         if (headerTitle) headerTitle.textContent = matchedTool.name;
         document.title = `${matchedTool.name} | ShengTools`;
-        viewport.innerHTML = "";
-        matchedTool.render(viewport);
+
+        // 隱藏首頁面板
+        homePanel.classList.add("tab-panel-hidden");
+
+        // 檢查該工具的獨立分頁面板是否已經存在
+        let toolPathPanel = document.getElementById(`tab-panel-${matchedTool.id}`);
+        if (!toolPathPanel) {
+            // 首次開啟：創建獨立容器面板並進行初始化渲染
+            toolPathPanel = document.createElement("div");
+            toolPathPanel.id = `tab-panel-${matchedTool.id}`;
+            toolPathPanel.className = "tool-tab-panel";
+            viewport.appendChild(toolPathPanel);
+            matchedTool.render(toolPathPanel);
+        }
+
+        // 顯示當前工具面板，隱藏其他所有分頁面板 (完全保留輸入值與狀態)
+        viewport.querySelectorAll(".tool-tab-panel").forEach(p => {
+            if (p.id === `tab-panel-${matchedTool.id}`) {
+                p.classList.remove("tab-panel-hidden");
+            } else {
+                p.classList.add("tab-panel-hidden");
+            }
+        });
     } else {
         if (headerTitle) headerTitle.textContent = "首頁";
         document.title = "ShengTools | 多功能工具箱";
